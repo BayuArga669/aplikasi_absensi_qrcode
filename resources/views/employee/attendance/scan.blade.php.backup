@@ -9,11 +9,11 @@
         </a>
     </div>
 
-    <div class="row flex-column flex-md-row">
+    <div class="row">
         <div class="col-lg-12">
-            <div class="row flex-column flex-md-row">
+            <div class="row">
                 <!-- Check-in Status Card -->
-                <div class="col-xl-4 col-lg-5 col-12">
+                <div class="col-xl-4 col-lg-5">
                     <div class="card shadow mb-4">
                         <div class="card-body text-center">
                             @if($todayAttendance)
@@ -37,7 +37,7 @@
                 </div>
 
                 <!-- QR Scanner Card -->
-                <div class="col-xl-8 col-lg-7 col-12">
+                <div class="col-xl-8 col-lg-7">
                     <div class="card shadow mb-4">
                         <div class="card-header py-3">
                             <h6 class="m-0 font-weight-bold text-primary">QR Scanner</h6>
@@ -86,13 +86,13 @@
                     <h6 class="m-0 font-weight-bold text-primary">Location Information</h6>
                 </div>
                 <div class="card-body">
-                    <div class="row flex-column flex-md-row">
-                        <div class="col-md-8 col-12 mb-3 mb-md-0">
+                    <div class="row">
+                        <div class="col-md-8">
                             <h6 class="font-weight-bold">Current Location</h6>
                             <p class="mb-0" id="currentLocation">Detecting location...</p>
                             <small class="text-muted" id="locationAccuracy">Accuracy: </small>
                         </div>
-                        <div class="col-md-4 col-12">
+                        <div class="col-md-4 text-md-end">
                             <h6 class="font-weight-bold">Status</h6>
                             <span id="locationStatus" class="badge bg-secondary">Checking...</span>
                         </div>

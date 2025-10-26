@@ -177,22 +177,22 @@
                 </div>
                 <div class="card-body">
                     <div class="row">
-                        <div class="col-md-3 col-6 mb-3">
+                        <div class="col-md-3 mb-3">
                             <a href="{{ route('employee.attendance.scan') }}" class="btn btn-success w-100">
                                 <i class="fas fa-qrcode me-2"></i>QR Check-in
                             </a>
                         </div>
-                        <div class="col-md-3 col-6 mb-3">
+                        <div class="col-md-3 mb-3">
                             <a href="{{ route('employee.attendance.history') }}" class="btn btn-primary w-100">
                                 <i class="fas fa-history me-2"></i>Attendance History
                             </a>
                         </div>
-                        <div class="col-md-3 col-6 mb-3">
+                        <div class="col-md-3 mb-3">
                             <a href="{{ route('employee.leave-requests.create') }}" class="btn btn-warning w-100">
                                 <i class="fas fa-file-alt me-2"></i>Request Leave
                             </a>
                         </div>
-                        <div class="col-md-3 col-6 mb-3">
+                        <div class="col-md-3 mb-3">
                             <a href="{{ route('employee.profile.edit') }}" class="btn btn-secondary w-100">
                                 <i class="fas fa-user me-2"></i>Profile Settings
                             </a>
