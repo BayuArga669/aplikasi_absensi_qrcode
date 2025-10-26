@@ -110,14 +110,19 @@
     </div>
 </div>
 
-<!-- Include QuaggaJS for QR code scanning -->
-<script src="https://cdn.jsdelivr.net/npm/quagga@0.12.1/dist/quagga.min.js"></script>
+<!-- Include jsQR for QR code scanning -->
+<script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js"></script>
 
 <script>
     let currentLocation = null;
-    let officeLocation = { lat: -6.200000, lng: 106.816666 }; // Default office location
+    @if(isset($officeLocation))
+    let officeLocation = { lat: {{ $officeLocation->latitude }}, lng: {{ $officeLocation->longitude }} }; // Office location from database
+    let officeRadius = {{ $officeLocation->radius }}; // Office radius from database
+    @else
+    let officeLocation = { lat: -6.200000, lng: 106.816666 }; // Default fallback location
+    let officeRadius = 50; // 50 meters fallback radius
+    @endif
     let locationAccuracy = 0;
-    const officeRadius = 50; // 50 meters radius
     
     // Get user's location
     function getCurrentLocation() {
@@ -209,28 +214,80 @@
         document.getElementById('startCamera').style.display = 'none';
         document.getElementById('cameraPlaceholder').innerHTML = `
             <video id="video" width="100%" height="auto" autoplay playsinline></video>
-            <div id="canvas-container" class="mt-3" style="display: none;">
-                <canvas id="canvas" width="640" height="480"></canvas>
-            </div>
+            <canvas id="canvas" style="display: none;"></canvas>
             <div id="result" class="mt-3 text-center" style="min-height: 30px;"></div>
         `;
         
         const video = document.getElementById('video');
+        const canvas = document.getElementById('canvas');
+        const canvasContext = canvas.getContext('2d');
+        let scanningActive = true;
         
         if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
             navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } })
                 .then(function(stream) {
                     video.srcObject = stream;
                     
-                    // Start QR code detection
-                    setTimeout(() => {
-                        Quagga.decodeSingle({
-                            decoder: {
-                                readers: ["code_128_reader", "ean_reader", "ean_8_reader", "code_39_reader", "code_39_vin_reader", "codabar_reader", "upc_reader", "upc_e_reader", "i2of5_reader"]
-                            },
-                            src: '/path/to/image.jpg' // This would be replaced with the video stream
-                        });
-                    }, 2000);
+                    // Function to scan QR codes
+                    function scanQR() {
+                        if (!scanningActive) return;
+                        
+                        // Set canvas dimensions to match video
+                        canvas.width = video.videoWidth;
+                        canvas.height = video.videoHeight;
+                        
+                        // Draw video frame to canvas
+                        canvasContext.drawImage(video, 0, 0, canvas.width, canvas.height);
+                        
+                        // Get image data from canvas
+                        const imageData = canvasContext.getImageData(0, 0, canvas.width, canvas.height);
+                        
+                        // Decode QR code
+                        const code = jsQR(imageData.data, imageData.width, imageData.height);
+                        
+                        if (code) {
+                            // QR code detected
+                            document.getElementById('manualCheckIn').value = code.data;
+                            document.getElementById('result').innerHTML = `<span class="text-success">QR Code detected: ${code.data.substring(0, 20)}...</span>`;
+                            
+                            // Automatically process check-in if location is valid
+                            if (currentLocation) {
+                                fetch('/employee/attendance/check-in', {
+                                    method: 'POST',
+                                    headers: {
+                                        'Content-Type': 'application/json',
+                                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                                    },
+                                    body: JSON.stringify({
+                                        qr_code: code.data,
+                                        latitude: currentLocation.lat,
+                                        longitude: currentLocation.lng
+                                    })
+                                })
+                                .then(response => response.json())
+                                .then(data => {
+                                    if (data.success) {
+                                        document.getElementById('result').innerHTML = '<span class="text-success">Check-in successful!</span>';
+                                        setTimeout(() => location.reload(), 1500);
+                                    } else {
+                                        document.getElementById('result').innerHTML = `<span class="text-danger">Check-in failed: ${data.message}</span>`;
+                                    }
+                                })
+                                .catch(error => {
+                                    console.error('Error:', error);
+                                    document.getElementById('result').innerHTML = '<span class="text-danger">An error occurred during check-in</span>';
+                                });
+                            }
+                        }
+                        
+                        // Continue scanning
+                        requestAnimationFrame(scanQR);
+                    }
+                    
+                    // Start scanning after video loads
+                    video.addEventListener('play', function() {
+                        requestAnimationFrame(scanQR);
+                    });
                 })
                 .catch(function(err) {
                     console.error("An error occurred: ", err);
@@ -274,7 +331,32 @@
             const qrValue = document.getElementById('manualCheckIn').value.trim();
             if (qrValue) {
                 // In a real implementation, this would make an API call to record attendance
-                alert('In a real implementation, this would send the QR code and location to the server for verification and check-in recording.');
+                // Send QR code and location to server
+                fetch('/employee/attendance/check-in', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                    },
+                    body: JSON.stringify({
+                        qr_code: qrValue,
+                        latitude: currentLocation.lat,
+                        longitude: currentLocation.lng
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert('Check-in successful!');
+                        location.reload(); // Refresh the page to show the updated status
+                    } else {
+                        alert('Check-in failed: ' + data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('An error occurred during check-in');
+                });
             }
         });
     });

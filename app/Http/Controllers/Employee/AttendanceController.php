@@ -19,14 +19,44 @@ class AttendanceController extends Controller
             ->whereDate('check_in_time', Carbon::today())
             ->first();
         
-        return view('employee.attendance.scan', compact('todayAttendance'));
+        // Get the most common/primary office location (you might want to adjust this logic based on your business rules)
+        $officeLocations = \App\Models\OfficeLocation::where('is_active', true)->get();
+        $officeLocation = $officeLocations->first(); // Using first active office
+        
+        return view('employee.attendance.scan', compact('todayAttendance', 'officeLocation'));
     }
 
     public function checkIn(Request $request)
     {
-        // This would be implemented to handle QR code scanning and attendance recording
-        // For now, we'll just return a response
-        return response()->json(['status' => 'success', 'message' => 'Check-in recorded']);
+        $request->validate([
+            'qr_code' => 'required|string',
+            'latitude' => 'required|numeric',
+            'longitude' => 'required|numeric',
+        ]);
+
+        // Use the API controller's services to process the check-in
+        $qrCodeService = app(\App\Services\QrCodeService::class);
+        $attendanceService = app(\App\Services\AttendanceService::class);
+
+        // Validate QR code
+        $qrCode = $qrCodeService->validateQrCode($request->qr_code);
+
+        if (!$qrCode) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Invalid or expired QR code',
+            ], 400);
+        }
+
+        // Process check-in
+        $result = $attendanceService->checkIn(
+            auth()->user(),
+            $qrCode,
+            $request->latitude,
+            $request->longitude
+        );
+
+        return response()->json($result, $result['success'] ? 200 : 400);
     }
 
     public function history(Request $request)

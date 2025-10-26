@@ -48,6 +48,7 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::get('/qr-generator', [QrCodeController::class, 'index'])->name('qr-generator');
     Route::post('/qrcode/generate', [QrCodeController::class, 'generate'])->name('qr-code.generate');
     Route::get('/qrcode/display/{officeLocation}', [QrCodeController::class, 'display'])->name('qr-code.display');
+    Route::get('/qrcode/display-large/{officeLocation}', [QrCodeController::class, 'showLargeQr'])->name('qr-code.display-large');
     
     // Reports
     Route::prefix('reports')->name('reports.')->group(function () {

@@ -6,8 +6,19 @@
     <p class="lead">Display this QR code at the office for employee check-in.</p>
     
     <div class="card shadow mb-4">
-        <div class="card-header py-3">
+        <div class="card-header py-3 d-flex justify-content-between align-items-center">
             <h6 class="m-0 font-weight-bold text-primary">Office QR Code</h6>
+            <div class="dropdown">
+                <a class="dropdown-toggle" href="#" role="button" id="dropdownMenuLink"
+                    data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-400"></i>
+                </a>
+                <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenuLink">
+                    <a class="dropdown-item" href="{{ route('admin.qr-code.display-large', $officeLocation->id) }}">
+                        <i class="fas fa-qrcode me-2"></i>View Large QR Code
+                    </a>
+                </div>
+            </div>
         </div>
         <div class="card-body text-center">
             <div id="qrCodeContainer" class="d-inline-block border p-3 bg-light rounded mb-3">
@@ -17,8 +28,8 @@
             </div>
             
             <div class="mt-3">
-                <p><strong>Location:</strong> {{ $currentQrCode->office_location }}</p>
-                <p><strong>Valid Until:</strong> <span id="countdown">{{ $currentQrCode->valid_until }}</span></p>
+                <p><strong>Location:</strong> {{ $officeLocation->name }}</p>
+                <p><strong>Valid Until:</strong> <span id="countdown">{{ $currentQrCode->expires_at }}</span></p>
             </div>
         </div>
     </div>
@@ -55,7 +66,7 @@
         generateQRCode();
         
         // Set up countdown timer
-        const expirationTime = new Date("{{ $currentQrCode->valid_until }}").getTime();
+        const expirationTime = new Date("{{ $currentQrCode->expires_at }}").getTime();
         
         const countdownInterval = setInterval(function() {
             const now = new Date().getTime();

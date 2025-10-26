@@ -36,7 +36,7 @@ class OfficeController extends Controller
             'latitude' => $request->latitude,
             'longitude' => $request->longitude,
             'radius' => $request->radius,
-            'is_active' => $request->has('is_active')
+            'is_active' => $request->boolean('is_active', true) // Default to true if not provided
         ]);
 
         return redirect()->route('admin.offices.index')->with('success', 'Office location created successfully.');
@@ -67,7 +67,7 @@ class OfficeController extends Controller
             'latitude' => $request->latitude,
             'longitude' => $request->longitude,
             'radius' => $request->radius,
-            'is_active' => $request->has('is_active')
+            'is_active' => $request->boolean('is_active', true) // Default to true if not provided
         ]);
 
         return redirect()->route('admin.offices.index')->with('success', 'Office location updated successfully.');
@@ -76,8 +76,16 @@ class OfficeController extends Controller
     public function destroy($id)
     {
         $office = OfficeLocation::findOrFail($id);
-        $office->delete();
-
-        return redirect()->route('admin.offices.index')->with('success', 'Office location deleted successfully.');
+        
+        try {
+            $office->delete();
+            return redirect()->route('admin.offices.index')->with('success', 'Office location deleted successfully.');
+        } catch (\Exception $e) {
+            // Handle foreign key constraint violations or other database errors
+            if ($e->getCode() == 23000) {
+                return redirect()->route('admin.offices.index')->with('error', 'Cannot delete office location because it is being used by QR codes or other records.');
+            }
+            return redirect()->route('admin.offices.index')->with('error', 'An error occurred while deleting the office location.');
+        }
     }
 }

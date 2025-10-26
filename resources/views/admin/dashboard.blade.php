@@ -12,7 +12,7 @@
     <!-- Content Row -->
     <div class="row">
         <!-- Total Employees Card -->
-        <div class="col-xl-3 col-md-6 mb-4">
+        <div class="col-xl-3 col-lg-6 col-md-6 col-12 mb-4">
             <div class="card border-left-primary shadow h-100 py-2">
                 <div class="card-body">
                     <div class="row no-gutters align-items-center">
@@ -30,7 +30,7 @@
         </div>
 
         <!-- Present Today Card -->
-        <div class="col-xl-3 col-md-6 mb-4">
+        <div class="col-xl-3 col-lg-6 col-md-6 col-12 mb-4">
             <div class="card border-left-success shadow h-100 py-2">
                 <div class="card-body">
                     <div class="row no-gutters align-items-center">
@@ -48,7 +48,7 @@
         </div>
 
         <!-- Late Today Card -->
-        <div class="col-xl-3 col-md-6 mb-4">
+        <div class="col-xl-3 col-lg-6 col-md-6 col-12 mb-4">
             <div class="card border-left-warning shadow h-100 py-2">
                 <div class="card-body">
                     <div class="row no-gutters align-items-center">
@@ -66,7 +66,7 @@
         </div>
 
         <!-- Absent Today Card -->
-        <div class="col-xl-3 col-md-6 mb-4">
+        <div class="col-xl-3 col-lg-6 col-md-6 col-12 mb-4">
             <div class="card border-left-danger shadow h-100 py-2">
                 <div class="card-body">
                     <div class="row no-gutters align-items-center">
@@ -87,7 +87,7 @@
     <!-- Content Row -->
     <div class="row">
         <!-- Area Chart -->
-        <div class="col-xl-8 col-lg-7">
+        <div class="col-xl-8 col-lg-7 col-md-12">
             <div class="card shadow mb-4">
                 <!-- Card Header - Dropdown -->
                 <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
@@ -117,7 +117,7 @@
         </div>
 
         <!-- Pie Chart -->
-        <div class="col-xl-4 col-lg-5">
+        <div class="col-xl-4 col-lg-5 col-md-12">
             <div class="card shadow mb-4">
                 <!-- Card Header - Dropdown -->
                 <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
@@ -160,7 +160,7 @@
     <!-- Content Row -->
     <div class="row">
         <!-- Recent Activity -->
-        <div class="col-lg-6 mb-4">
+        <div class="col-lg-6 col-md-12 mb-4">
             <div class="card shadow mb-4">
                 <div class="card-header py-3">
                     <h6 class="m-0 font-weight-bold text-primary">Recent Attendance</h6>
@@ -171,7 +171,7 @@
                             @foreach($recentAttendance as $attendance)
                                 <li class="list-group-item">
                                     <div class="row">
-                                        <div class="col-8">
+                                        <div class="col-12 col-sm-8">
                                             <div class="font-weight-bold">
                                                 {{ $attendance->user->name ?? 'N/A' }}
                                             </div>
@@ -182,7 +182,7 @@
                                                 @endif
                                             </div>
                                         </div>
-                                        <div class="col-4 text-right">
+                                        <div class="col-12 col-sm-4 text-right mt-2 mt-sm-0">
                                             <span class="badge 
                                                 @if($attendance->status === 'present') badge-success
                                                 @elseif($attendance->status === 'late') badge-warning
@@ -202,7 +202,7 @@
         </div>
 
         <!-- Recent Leave Requests -->
-        <div class="col-lg-6 mb-4">
+        <div class="col-lg-6 col-md-12 mb-4">
             <div class="card shadow mb-4">
                 <div class="card-header py-3">
                     <h6 class="m-0 font-weight-bold text-primary">Recent Leave Requests</h6>
@@ -213,7 +213,7 @@
                             @foreach($recentLeaveRequests as $request)
                                 <li class="list-group-item">
                                     <div class="row">
-                                        <div class="col-8">
+                                        <div class="col-12 col-sm-8">
                                             <div class="font-weight-bold">
                                                 {{ $request->user->name ?? 'N/A' }}
                                             </div>
@@ -221,7 +221,7 @@
                                                 {{ $request->type }} - {{ $request->start_date }} to {{ $request->end_date }}
                                             </div>
                                         </div>
-                                        <div class="col-4 text-right">
+                                        <div class="col-12 col-sm-4 text-right mt-2 mt-sm-0">
                                             <span class="badge 
                                                 @if($request->status === 'pending') badge-warning
                                                 @elseif($request->status === 'approved') badge-success

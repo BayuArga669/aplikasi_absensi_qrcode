@@ -4,9 +4,22 @@
 <div class="container-fluid">
     <div class="d-sm-flex align-items-center justify-content-between mb-4">
         <h1 class="h3 mb-0 text-gray-800">Office Locations</h1>
-        <a href="{{ route('admin.offices.create') }}" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm">
-            <i class="fas fa-plus fa-sm text-white-50"></i> Add New Office
-        </a>
+        <div class="d-flex">
+            <div class="dropdown me-2">
+                <a class="dropdown-toggle btn btn-sm btn-info shadow-sm d-none d-sm-inline-block" href="#" role="button" id="qrDropdownMenu"
+                    data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <i class="fas fa-qrcode fa-sm text-white-50"></i> QR Options
+                </a>
+                <div class="dropdown-menu dropdown-menu-right" aria-labelledby="qrDropdownMenu">
+                    <a class="dropdown-item" href="{{ route('admin.qr-generator') }}">
+                        <i class="fas fa-sync-alt me-2"></i>QR Generator
+                    </a>
+                </div>
+            </div>
+            <a href="{{ route('admin.offices.create') }}" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm">
+                <i class="fas fa-plus fa-sm text-white-50"></i> Add New Office
+            </a>
+        </div>
     </div>
 
     @if(session('success'))
@@ -15,6 +28,11 @@
         </div>
     @endif
 
+    @if(session('error'))
+        <div class="alert alert-danger">
+            {{ session('error') }}
+        </div>
+    @endif
     <div class="card shadow mb-4">
         <div class="card-body">
             <div class="table-responsive">
