@@ -84,22 +84,24 @@
             margin-left: 0;
         }
         
-        /* For mobile view: hide sidebar and show content full width */
+        /* For mobile view: sidebar is hidden by default */
         @media (max-width: 767.98px) {
             #sidebar-wrapper {
-                display: none;
+                margin-left: -15rem;
             }
             
-            #page-content-wrapper {
-                width: 100% !important;
-                margin-left: 0 !important;
+            #wrapper.toggled #sidebar-wrapper {
+                margin-left: 0;
+            }
+            
+            #wrapper.toggled #page-content-wrapper {
+                margin-left: 0;
             }
         }
         
-        /* For desktop view: show sidebar */
+        /* For desktop view: sidebar is shown by default */
         @media (min-width: 768px) {
             #sidebar-wrapper {
-                display: block;
                 margin-left: 0;
             }
             
@@ -145,104 +147,7 @@
     @if(request()->is('login') || request()->is('register') || request()->is('password/reset*') || request()->is('password/email') || request()->is('/') || request()->is('home'))
     <!-- Full width layout for auth pages -->
     <div id="page-content-wrapper">
-            <!-- Mobile sidebar as offcanvas -->
-            <div class="offcanvas offcanvas-start" tabindex="-1" id="mobileSidebar" aria-labelledby="mobileSidebarLabel">
-                <div class="offcanvas-header">
-                    <h5 class="offcanvas-title" id="mobileSidebarLabel">
-                        <i class="fas fa-qrcode me-2"></i>QR Absensi
-                    </h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
-                </div>
-                <div class="offcanvas-body">
-                    <div class="list-group list-group-flush">
-                        @auth
-                            @if(auth()->user()->role === 'admin')
-                                <a href="{{ route('admin.dashboard') }}" class="list-group-item list-group-item-action {{ Request::is('admin/dashboard*') ? 'active' : '' }}">
-                                    <i class="fas fa-tachometer-alt me-2"></i>Dashboard
-                                </a>
-                                <a href="{{ route('admin.employees.index') }}" class="list-group-item list-group-item-action {{ Request::is('admin/employees*') ? 'active' : '' }}">
-                                    <i class="fas fa-users me-2"></i>Employee Management
-                                </a>
-                                <a href="{{ route('admin.qr-generator') }}" class="list-group-item list-group-item-action {{ Request::is('admin/qr*') ? 'active' : '' }}">
-                                    <i class="fas fa-qrcode me-2"></i>QR Generator
-                                </a>
-                                <a href="{{ route('admin.reports.index') }}" class="list-group-item list-group-item-action {{ Request::is('admin/reports*') ? 'active' : '' }}">
-                                    <i class="fas fa-chart-bar me-2"></i>Reports
-                                </a>
-                                <a href="{{ route('admin.leave-requests') }}" class="list-group-item list-group-item-action {{ Request::is('admin/leave*') ? 'active' : '' }}">
-                                    <i class="fas fa-file-alt me-2"></i>Leave Requests
-                                </a>
-                            @elseif(auth()->user()->role === 'superior')
-                                <a href="{{ route('superior.dashboard') }}" class="list-group-item list-group-item-action {{ Request::is('superior/dashboard*') ? 'active' : '' }}">
-                                    <i class="fas fa-tachometer-alt me-2"></i>Dashboard
-                                </a>
-                                <a href="{{ route('superior.team.index') }}" class="list-group-item list-group-item-action {{ Request::is('superior/team*') ? 'active' : '' }}">
-                                    <i class="fas fa-users me-2"></i>Team Monitoring
-                                </a>
-                                <a href="{{ route('superior.late-reports') }}" class="list-group-item list-group-item-action {{ Request::is('superior/reports*') ? 'active' : '' }}">
-                                    <i class="fas fa-clock me-2"></i>Late Reports
-                                </a>
-                            @elseif(auth()->user()->role === 'employee')
-                                <a href="{{ route('employee.dashboard') }}" class="list-group-item list-group-item-action {{ Request::is('employee/dashboard*') ? 'active' : '' }}">
-                                    <i class="fas fa-tachometer-alt me-2"></i>Dashboard
-                                </a>
-                                <a href="{{ route('employee.attendance.scan') }}" class="list-group-item list-group-item-action {{ Request::is('employee/attendance*') ? 'active' : '' }}">
-                                    <i class="fas fa-qrcode me-2"></i>QR Scan
-                                </a>
-                                <a href="{{ route('employee.attendance.history') }}" class="list-group-item list-group-item-action {{ Request::is('employee/history*') ? 'active' : '' }}">
-                                    <i class="fas fa-history me-2"></i>Attendance History
-                                </a>
-                                <a href="{{ route('employee.leave-requests.create') }}" class="list-group-item list-group-item-action {{ Request::is('employee/leave*') ? 'active' : '' }}">
-                                    <i class="fas fa-file-alt me-2"></i>Leave Request
-                                </a>
-                            @endif
-                        @endauth
-                    </div>
-                </div>
-            </div>        <nav class="navbar navbar-expand navbar-light bg-light border-bottom">
-            <div class="container-fluid">
-                <a class="navbar-brand fw-bold" href="{{ url('/') }}">
-                    <i class="fas fa-qrcode me-2"></i>{{ config('app.name', 'QR Attendance') }}
-                </a>
-                
-                <ul class="navbar-nav ms-auto">
-                    @guest
-                        @if (Route::has('login'))
-                            <li class="nav-item">
-                                <a class="nav-link" href="{{ route('login') }}">Login</a>
-                            </li>
-                        @endif
-
-                        @if (Route::has('register'))
-                            <li class="nav-item">
-                                <a class="nav-link" href="{{ route('register') }}">Register</a>
-                            </li>
-                        @endif
-                    @else
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                <i class="fas fa-user-circle me-2"></i>{{ Auth::user()->name }}
-                            </a>
-                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
-                                <li><a class="dropdown-item" href="{{ route('employee.profile') }}"><i class="fas fa-user me-2"></i>Profile</a></li>
-                                <li><hr class="dropdown-divider"></li>
-                                <li>
-                                    <a class="dropdown-item" href="{{ route('logout') }}"
-                                       onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
-                                        <i class="fas fa-sign-out-alt me-2"></i>Logout
-                                    </a>
-                                    <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
-                                        @csrf
-                                    </form>
-                                </li>
-                            </ul>
-                        </li>
-                    @endguest
-                </ul>
-            </div>
-        </nav>
-
-        <div class="container main-content">
+        <div class="container-fluid main-content px-0">
             @yield('content')
         </div>
     </div>
@@ -302,61 +207,7 @@
 
         <!-- Page content wrapper -->
         <div id="page-content-wrapper">
-            <!-- Mobile sidebar as offcanvas -->
-            <div class="offcanvas offcanvas-start" tabindex="-1" id="mobileSidebar" aria-labelledby="mobileSidebarLabel">
-                <div class="offcanvas-header">
-                    <h5 class="offcanvas-title" id="mobileSidebarLabel">
-                        <i class="fas fa-qrcode me-2"></i>QR Absensi
-                    </h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
-                </div>
-                <div class="offcanvas-body">
-                    <div class="list-group list-group-flush">
-                        @auth
-                            @if(auth()->user()->role === 'admin')
-                                <a href="{{ route('admin.dashboard') }}" class="list-group-item list-group-item-action {{ Request::is('admin/dashboard*') ? 'active' : '' }}">
-                                    <i class="fas fa-tachometer-alt me-2"></i>Dashboard
-                                </a>
-                                <a href="{{ route('admin.employees.index') }}" class="list-group-item list-group-item-action {{ Request::is('admin/employees*') ? 'active' : '' }}">
-                                    <i class="fas fa-users me-2"></i>Employee Management
-                                </a>
-                                <a href="{{ route('admin.qr-generator') }}" class="list-group-item list-group-item-action {{ Request::is('admin/qr*') ? 'active' : '' }}">
-                                    <i class="fas fa-qrcode me-2"></i>QR Generator
-                                </a>
-                                <a href="{{ route('admin.reports.index') }}" class="list-group-item list-group-item-action {{ Request::is('admin/reports*') ? 'active' : '' }}">
-                                    <i class="fas fa-chart-bar me-2"></i>Reports
-                                </a>
-                                <a href="{{ route('admin.leave-requests') }}" class="list-group-item list-group-item-action {{ Request::is('admin/leave*') ? 'active' : '' }}">
-                                    <i class="fas fa-file-alt me-2"></i>Leave Requests
-                                </a>
-                            @elseif(auth()->user()->role === 'superior')
-                                <a href="{{ route('superior.dashboard') }}" class="list-group-item list-group-item-action {{ Request::is('superior/dashboard*') ? 'active' : '' }}">
-                                    <i class="fas fa-tachometer-alt me-2"></i>Dashboard
-                                </a>
-                                <a href="{{ route('superior.team.index') }}" class="list-group-item list-group-item-action {{ Request::is('superior/team*') ? 'active' : '' }}">
-                                    <i class="fas fa-users me-2"></i>Team Monitoring
-                                </a>
-                                <a href="{{ route('superior.late-reports') }}" class="list-group-item list-group-item-action {{ Request::is('superior/reports*') ? 'active' : '' }}">
-                                    <i class="fas fa-clock me-2"></i>Late Reports
-                                </a>
-                            @elseif(auth()->user()->role === 'employee')
-                                <a href="{{ route('employee.dashboard') }}" class="list-group-item list-group-item-action {{ Request::is('employee/dashboard*') ? 'active' : '' }}">
-                                    <i class="fas fa-tachometer-alt me-2"></i>Dashboard
-                                </a>
-                                <a href="{{ route('employee.attendance.scan') }}" class="list-group-item list-group-item-action {{ Request::is('employee/attendance*') ? 'active' : '' }}">
-                                    <i class="fas fa-qrcode me-2"></i>QR Scan
-                                </a>
-                                <a href="{{ route('employee.attendance.history') }}" class="list-group-item list-group-item-action {{ Request::is('employee/history*') ? 'active' : '' }}">
-                                    <i class="fas fa-history me-2"></i>Attendance History
-                                </a>
-                                <a href="{{ route('employee.leave-requests.create') }}" class="list-group-item list-group-item-action {{ Request::is('employee/leave*') ? 'active' : '' }}">
-                                    <i class="fas fa-file-alt me-2"></i>Leave Request
-                                </a>
-                            @endif
-                        @endauth
-                    </div>
-                </div>
-            </div>            <!-- Top navigation -->
+            <!-- Top navigation -->
             <nav class="navbar navbar-expand navbar-light bg-light border-bottom">
                 <div class="container-fluid">
                     <button class="btn btn-primary" id="menu-toggle">
@@ -402,24 +253,10 @@
     <!-- Custom JS -->
     <script>
         @if(!request()->is('login') && !request()->is('register') && !request()->is('password/reset*') && !request()->is('password/email') && !request()->is('/') && !request()->is('home'))
-        // Mobile menu toggle using Bootstrap 5 Offcanvas
+        // Menu Toggle Script for dashboard layouts only
         document.getElementById('menu-toggle').addEventListener('click', function(e) {
             e.preventDefault();
-            // Use Bootstrap's offcanvas for mobile devices
-            const offcanvasElement = document.getElementById('mobileSidebar');
-            const offcanvas = new bootstrap.Offcanvas(offcanvasElement);
-            offcanvas.show();
-        });
-        
-        // Close offcanvas when clicking on any menu item (for mobile)
-        document.querySelectorAll('#mobileSidebar .list-group-item').forEach(item => {
-            item.addEventListener('click', function() {
-                const offcanvasElement = document.getElementById('mobileSidebar');
-                const offcanvas = bootstrap.Offcanvas.getInstance(offcanvasElement);
-                if (offcanvas) {
-                    offcanvas.hide();
-                }
-            });
+            document.getElementById('wrapper').classList.toggle('toggled');
         });
         @endif
     </script>

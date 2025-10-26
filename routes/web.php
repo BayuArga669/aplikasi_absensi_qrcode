@@ -6,6 +6,7 @@ use App\Http\Controllers\Admin\EmployeeController;
 use App\Http\Controllers\Admin\QrCodeController;
 use App\Http\Controllers\Admin\AttendanceReportController;
 use App\Http\Controllers\Admin\LeaveRequestAdminController;
+use App\Http\Controllers\Admin\OfficeController;
 use App\Http\Controllers\Superior\SuperiorDashboardController;
 use App\Http\Controllers\Superior\TeamController;
 use App\Http\Controllers\Superior\LateReportController;
@@ -61,6 +62,9 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::get('/leave-requests', [LeaveRequestAdminController::class, 'index'])->name('leave-requests');
     Route::post('/leave-requests/{id}/approve', [LeaveRequestAdminController::class, 'approve'])->name('leave-requests.approve');
     Route::put('/leave-requests/{id}/reject', [LeaveRequestAdminController::class, 'reject'])->name('leave-requests.reject');
+    
+    // Office Management
+    Route::resource('offices', OfficeController::class);
 });
 
 // Superior routes
