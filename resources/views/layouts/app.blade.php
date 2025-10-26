@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+
+    <title>{{ config('app.name', 'Laravel') }}</title>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.bunny.net">
+    <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
+
+    <!-- Scripts -->
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <!-- Custom CSS -->
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        .sidebar {
+            min-height: 100vh;
+            background-color: #343a40;
+        }
+        .sidebar a {
+            color: #adb5bd;
+        }
+        .sidebar a:hover {
+            color: #fff;
+            text-decoration: none;
+        }
+        .sidebar .active {
+            background-color: #495057;
+            color: #fff;
+        }
+        .main-content {
+            padding-top: 20px;
+        }
+        .card {
+            box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
+        }
+        
+        #wrapper {
+            overflow-x: hidden;
+        }
+        
+        #sidebar-wrapper {
+            min-height: 100vh;
+            margin-left: -15rem;
+            transition: margin 0.25s ease-out;
+        }
+        
+        #sidebar-wrapper .sidebar-heading {
+            padding: 0.875rem 1.25rem;
+            font-size: 1.2rem;
+        }
+        
+        #page-content-wrapper {
+            min-width: 100vw;
+            transition: padding-left 0.25s ease;
+        }
+        
+        #wrapper.toggled #sidebar-wrapper {
+            margin-left: 0;
+        }
+        
+        #wrapper.toggled #page-content-wrapper {
+            margin-left: 0;
+            width: 100%;
+            transition: all 0.25s ease;
+        }
+        
+        @media (min-width: 768px) {
+            #sidebar-wrapper {
+                margin-left: 0;
+            }
+            
+            #page-content-wrapper {
+                min-width: 0;
+                width: 100%;
+                padding-left: 0.5rem;
+            }
+            
+            #wrapper.toggled #sidebar-wrapper {
+                margin-left: -15rem;
+            }
+            
+            #wrapper.toggled #page-content-wrapper {
+                margin-left: 0;
+                width: 100%;
+            }
+        }
+        .attendance-status {
+            font-weight: 500;
+        }
+        .status-present {
+            color: #28a745;
+        }
+        .status-late {
+            color: #ffc107;
+        }
+        .status-absent {
+            color: #dc3545;
+        }
+        
+        /* Full width content for authentication pages */
+        .full-width-content {
+            margin-left: 0;
+            width: 100%;
+        }
+        
+        .full-width-content #page-content-wrapper {
+            margin-left: 0;
+        }
+    </style>
+</head>
+<body class="font-sans antialiased">
+    @if(request()->is('login') || request()->is('register') || request()->is('password/reset*') || request()->is('password/email') || request()->is('/') || request()->is('home'))
+    <!-- Full width layout for auth pages -->
+    <div id="page-content-wrapper">
+        <nav class="navbar navbar-expand navbar-light bg-light border-bottom">
+            <div class="container-fluid">
+                <a class="navbar-brand fw-bold" href="{{ url('/') }}">
+                    <i class="fas fa-qrcode me-2"></i>{{ config('app.name', 'QR Attendance') }}
+                </a>
+                
+                <ul class="navbar-nav ms-auto">
+                    @guest
+                        @if (Route::has('login'))
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ route('login') }}">Login</a>
+                            </li>
+                        @endif
+
+                        @if (Route::has('register'))
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ route('register') }}">Register</a>
+                            </li>
+                        @endif
+                    @else
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="fas fa-user-circle me-2"></i>{{ Auth::user()->name }}
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
+                                <li><a class="dropdown-item" href="{{ route('employee.profile') }}"><i class="fas fa-user me-2"></i>Profile</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li>
+                                    <a class="dropdown-item" href="{{ route('logout') }}"
+                                       onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                                        <i class="fas fa-sign-out-alt me-2"></i>Logout
+                                    </a>
+                                    <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
+                                        @csrf
+                                    </form>
+                                </li>
+                            </ul>
+                        </li>
+                    @endguest
+                </ul>
+            </div>
+        </nav>
+
+        <div class="container main-content">
+            @yield('content')
+        </div>
+    </div>
+    @else
+    <!-- Sidebar layout for dashboard pages -->
+    <div class="d-flex wrapper" id="wrapper">
+        <!-- Sidebar -->
+        <div class="bg-dark border-end" id="sidebar-wrapper">
+            <div class="sidebar-heading py-3 text-white text-center fw-bold bg-primary">
+                <i class="fas fa-qrcode me-2"></i>QR Absensi
+            </div>
+            <div class="list-group list-group-flush">
+                @auth
+                    @if(auth()->user()->role === 'admin')
+                        <a href="{{ route('admin.dashboard') }}" class="list-group-item list-group-item-action {{ Request::is('admin/dashboard*') ? 'active' : '' }}">
+                            <i class="fas fa-tachometer-alt me-2"></i>Dashboard
+                        </a>
+                        <a href="{{ route('admin.employees.index') }}" class="list-group-item list-group-item-action {{ Request::is('admin/employees*') ? 'active' : '' }}">
+                            <i class="fas fa-users me-2"></i>Employee Management
+                        </a>
+                        <a href="{{ route('admin.qr-generator') }}" class="list-group-item list-group-item-action {{ Request::is('admin/qr*') ? 'active' : '' }}">
+                            <i class="fas fa-qrcode me-2"></i>QR Generator
+                        </a>
+                        <a href="{{ route('admin.reports.index') }}" class="list-group-item list-group-item-action {{ Request::is('admin/reports*') ? 'active' : '' }}">
+                            <i class="fas fa-chart-bar me-2"></i>Reports
+                        </a>
+                        <a href="{{ route('admin.leave-requests') }}" class="list-group-item list-group-item-action {{ Request::is('admin/leave*') ? 'active' : '' }}">
+                            <i class="fas fa-file-alt me-2"></i>Leave Requests
+                        </a>
+                    @elseif(auth()->user()->role === 'superior')
+                        <a href="{{ route('superior.dashboard') }}" class="list-group-item list-group-item-action {{ Request::is('superior/dashboard*') ? 'active' : '' }}">
+                            <i class="fas fa-tachometer-alt me-2"></i>Dashboard
+                        </a>
+                        <a href="{{ route('superior.team.index') }}" class="list-group-item list-group-item-action {{ Request::is('superior/team*') ? 'active' : '' }}">
+                            <i class="fas fa-users me-2"></i>Team Monitoring
+                        </a>
+                        <a href="{{ route('superior.late-reports') }}" class="list-group-item list-group-item-action {{ Request::is('superior/reports*') ? 'active' : '' }}">
+                            <i class="fas fa-clock me-2"></i>Late Reports
+                        </a>
+                    @elseif(auth()->user()->role === 'employee')
+                        <a href="{{ route('employee.dashboard') }}" class="list-group-item list-group-item-action {{ Request::is('employee/dashboard*') ? 'active' : '' }}">
+                            <i class="fas fa-tachometer-alt me-2"></i>Dashboard
+                        </a>
+                        <a href="{{ route('employee.attendance.scan') }}" class="list-group-item list-group-item-action {{ Request::is('employee/attendance*') ? 'active' : '' }}">
+                            <i class="fas fa-qrcode me-2"></i>QR Scan
+                        </a>
+                        <a href="{{ route('employee.attendance.history') }}" class="list-group-item list-group-item-action {{ Request::is('employee/history*') ? 'active' : '' }}">
+                            <i class="fas fa-history me-2"></i>Attendance History
+                        </a>
+                        <a href="{{ route('employee.leave-requests.create') }}" class="list-group-item list-group-item-action {{ Request::is('employee/leave*') ? 'active' : '' }}">
+                            <i class="fas fa-file-alt me-2"></i>Leave Request
+                        </a>
+                    @endif
+                @endauth
+            </div>
+        </div>
+
+        <!-- Page content wrapper -->
+        <div id="page-content-wrapper">
+            <!-- Top navigation -->
+            <nav class="navbar navbar-expand navbar-light bg-light border-bottom">
+                <div class="container-fluid">
+                    <button class="btn btn-primary" id="menu-toggle">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    
+                    <ul class="navbar-nav ms-auto">
+                        @auth
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <i class="fas fa-user-circle me-2"></i>{{ Auth::user()->name }}
+                                </a>
+                                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
+                                    <li><a class="dropdown-item" href="{{ route('employee.profile') }}"><i class="fas fa-user me-2"></i>Profile</a></li>
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li>
+                                        <a class="dropdown-item" href="{{ route('logout') }}"
+                                           onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                                            <i class="fas fa-sign-out-alt me-2"></i>Logout
+                                        </a>
+                                        <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
+                                            @csrf
+                                        </form>
+                                    </li>
+                                </ul>
+                            </li>
+                        @endauth
+                    </ul>
+                </div>
+            </nav>
+
+            <!-- Main content -->
+            <div class="container-fluid main-content">
+                @yield('content')
+            </div>
+        </div>
+    </div>
+    @endif
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Custom JS -->
+    <script>
+        @if(!request()->is('login') && !request()->is('register') && !request()->is('password/reset*') && !request()->is('password/email') && !request()->is('/') && !request()->is('home'))
+        // Menu Toggle Script for dashboard layouts only
+        document.getElementById('menu-toggle').addEventListener('click', function(e) {
+            e.preventDefault();
+            document.getElementById('wrapper').classList.toggle('toggled');
+        });
+        @endif
+    </script>
+    
+    @yield('scripts')
+</body>
+</html>

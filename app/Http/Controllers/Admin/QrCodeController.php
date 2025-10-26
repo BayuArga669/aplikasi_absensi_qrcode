@@ -1,54 +1,55 @@
 <?php
-// app/Http/Controllers/Admin/QrCodeController.php
+
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Services\QrCodeService;
-use App\Models\OfficeLocation;
 use Illuminate\Http\Request;
-use SimpleSoftwareIO\QrCode\Facades\QrCode as QrCodeGenerator;
+use App\Models\QrCode as QrCodeModel;
+use Carbon\Carbon;
 
 class QrCodeController extends Controller
 {
-    protected $qrCodeService;
-
-    public function __construct(QrCodeService $qrCodeService)
-    {
-        $this->qrCodeService = $qrCodeService;
-    }
-
     public function index()
     {
-        $officeLocations = OfficeLocation::where('is_active', true)->get();
-        return view('admin.qrcode.index', compact('officeLocations'));
+        return view('admin.qr_generator');
     }
 
     public function generate(Request $request)
     {
-        $request->validate([
-            'office_location_id' => 'required|exists:office_locations,id',
+        // Generate a new QR code
+        $qrCode = QrCodeModel::create([
+            'code' => uniqid('qr_', true),
+            'valid_from' => Carbon::now(),
+            'valid_until' => Carbon::now()->addSeconds($request->duration ?? 30),
+            'office_location' => $request->office_location ?? 'Main Office',
+            'created_by' => auth()->id()
         ]);
-
-        $qrCode = $this->qrCodeService->generateQrCode(
-            $request->office_location_id,
-            30 // 30 seconds expiry
-        );
-
-        $qrCodeImage = QrCodeGenerator::size(300)->generate($qrCode->code);
-
+        
         return response()->json([
             'success' => true,
-            'data' => [
-                'code' => $qrCode->code,
-                'expires_at' => $qrCode->expires_at->toIso8601String(),
-                'qr_image' => $qrCodeImage,
-            ],
+            'qr_code' => $qrCode->code,
+            'expires_at' => $qrCode->valid_until
         ]);
     }
 
-    public function display($officeLocationId)
+    public function display($officeLocation)
     {
-        $officeLocation = OfficeLocation::findOrFail($officeLocationId);
-        return view('admin.qrcode.display', compact('officeLocation'));
+        // Display the QR code for the specified office location
+        $currentQrCode = QrCodeModel::where('office_location', $officeLocation)
+            ->where('valid_until', '>', Carbon::now())
+            ->first();
+            
+        if (!$currentQrCode) {
+            // Generate a new QR code if none is valid
+            $currentQrCode = QrCodeModel::create([
+                'code' => uniqid('qr_', true),
+                'valid_from' => Carbon::now(),
+                'valid_until' => Carbon::now()->addSeconds(30),
+                'office_location' => $officeLocation,
+                'created_by' => auth()->id()
+            ]);
+        }
+        
+        return view('admin.qr_display', compact('currentQrCode'));
     }
 }

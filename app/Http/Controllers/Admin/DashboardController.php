@@ -1,10 +1,14 @@
 <?php
-// app/Http/Controllers/Admin/DashboardController.php
+
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Services\AttendanceService;
 use Illuminate\Http\Request;
+use App\Services\AttendanceService;
+use App\Models\Attendance;
+use App\Models\LeaveRequest;
+use App\Models\User;
+use Carbon\Carbon;
 
 class DashboardController extends Controller
 {
@@ -17,8 +21,34 @@ class DashboardController extends Controller
 
     public function index()
     {
-        $stats = $this->attendanceService->getAttendanceStats();
+        // Get dashboard statistics
+        $totalEmployees = User::count();
+        $presentToday = Attendance::whereDate('check_in_time', Carbon::today())
+            ->where('status', 'present')
+            ->count();
+        $lateToday = Attendance::whereDate('check_in_time', Carbon::today())
+            ->where('status', 'late')
+            ->count();
+        $absentToday = $totalEmployees - ($presentToday + $lateToday);
+        
+        $recentAttendance = Attendance::with('user')
+            ->whereDate('check_in_time', Carbon::today())
+            ->orderBy('check_in_time', 'desc')
+            ->limit(10)
+            ->get();
+            
+        $recentLeaveRequests = LeaveRequest::with('user')
+            ->orderBy('created_at', 'desc')
+            ->limit(5)
+            ->get();
 
-        return view('admin.dashboard', compact('stats'));
+        return view('admin.dashboard', compact(
+            'totalEmployees',
+            'presentToday',
+            'lateToday',
+            'absentToday',
+            'recentAttendance',
+            'recentLeaveRequests'
+        ));
     }
 }
