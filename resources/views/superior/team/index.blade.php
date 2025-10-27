@@ -28,7 +28,7 @@
     <div class="row" id="teamMembers">
         @forelse($teamMembers as $member)
             <div class="col-xl-4 col-md-6 mb-4 team-member" data-status="{{ $member->attendance_status }}" data-name="{{ strtolower($member->name) }}">
-                <div class="card border-left-{{ $member->attendance_status === 'present' ? 'success' : ($member->attendance_status === 'late' ? 'warning' : 'danger') }} shadow h-100 py-2">
+                <div class="card border-left-{{ $member->attendance_status === 'on_time' ? 'success' : ($member->attendance_status === 'late' ? 'warning' : 'danger') }} shadow h-100 py-2">
                     <div class="card-body">
                         <div class="row no-gutters align-items-center">
                             <div class="col mr-2">
@@ -38,16 +38,21 @@
                                 <div class="h6 mb-0 text-gray-800">{{ $member->position }}</div>
                                 <div class="mt-2">
                                     <span class="attendance-status 
-                                        @if($member->attendance_status === 'present') status-present
+                                        @if($member->attendance_status === 'on_time') status-present
                                         @elseif($member->attendance_status === 'late') status-late
                                         @else status-absent @endif">
-                                        <i class="fas fa-{{ $member->attendance_status === 'present' ? 'check-circle' : ($member->attendance_status === 'late' ? 'clock' : 'times-circle') }} me-1"></i>
-                                        {{ ucfirst($member->attendance_status ?? 'absent') }}
+                                        @if($member->attendance_status === 'on_time')
+                                            <i class="fas fa-check me-1"></i>On Time
+                                        @elseif($member->attendance_status === 'late')
+                                            <i class="fas fa-clock me-1"></i>Late
+                                        @else
+                                            <i class="fas fa-times me-1"></i>{{ ucfirst(str_replace('_', ' ', $member->attendance_status ?? 'absent')) }}
+                                        @endif
                                     </span>
                                 </div>
                                 @if($member->check_in_time)
                                     <div class="text-xs text-muted mt-1">
-                                        Check-in: {{ $member->check_in_time }}
+                                        Check-in: {{ $member->check_in_time ? $member->check_in_time->timezone('Asia/Jakarta')->format('d M Y H:i') : '-' }}
                                     </div>
                                 @endif
                             </div>

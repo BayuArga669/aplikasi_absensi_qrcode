@@ -43,6 +43,7 @@
                             <th>Address</th>
                             <th>Coordinates</th>
                             <th>Radius (m)</th>
+                            <th>Check-in Deadline</th>
                             <th>Status</th>
                             <th>Actions</th>
                         </tr>
@@ -54,6 +55,7 @@
                                 <td>{{ $office->address }}</td>
                                 <td>{{ $office->latitude }}, {{ $office->longitude }}</td>
                                 <td>{{ $office->radius }}</td>
+                                <td>{{ $office->check_in_deadline }}</td>
                                 <td>
                                     <span class="badge 
                                         @if($office->is_active) bg-success 
@@ -77,7 +79,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="6" class="text-center">No office locations found.</td>
+                                <td colspan="7" class="text-center">No office locations found.</td>
                             </tr>
                         @endforelse
                     </tbody>

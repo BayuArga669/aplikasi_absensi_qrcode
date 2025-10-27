@@ -143,7 +143,7 @@
                     </div>
                     <div class="mt-4 text-center small">
                         <span class="mr-2">
-                            <i class="fas fa-circle text-primary"></i> Present
+                            <i class="fas fa-circle text-primary"></i> On Time
                         </span>
                         <span class="mr-2">
                             <i class="fas fa-circle text-warning"></i> Late
@@ -176,7 +176,7 @@
                                                 {{ $attendance->user->name ?? 'N/A' }}
                                             </div>
                                             <div class="text-muted small">
-                                                Check-in: {{ $attendance->check_in_time ?? '-' }}
+                                                Check-in: {{ $attendance->check_in_time ? $attendance->check_in_time->timezone('Asia/Jakarta')->format('d M Y H:i') : '-' }}
                                                 @if($attendance->status === 'late')
                                                     <span class="badge badge-warning">Late</span>
                                                 @endif
@@ -184,10 +184,16 @@
                                         </div>
                                         <div class="col-12 col-sm-4 text-right mt-2 mt-sm-0">
                                             <span class="badge 
-                                                @if($attendance->status === 'present') badge-success
+                                                @if($attendance->status === 'on_time') badge-success
                                                 @elseif($attendance->status === 'late') badge-warning
                                                 @else badge-danger @endif">
-                                                {{ ucfirst($attendance->status) }}
+                                                @if($attendance->status === 'on_time')
+                                                    <i class="fas fa-check me-1"></i>On Time
+                                                @elseif($attendance->status === 'late')
+                                                    <i class="fas fa-clock me-1"></i>Late
+                                                @else
+                                                    <i class="fas fa-times me-1"></i>{{ ucfirst(str_replace('_', ' ', $attendance->status)) }}
+                                                @endif
                                             </span>
                                         </div>
                                     </div>
@@ -330,7 +336,7 @@
     var myPieChart = new Chart(ctx, {
         type: 'doughnut',
         data: {
-            labels: ["Present", "Late", "Absent"],
+            labels: ["On Time", "Late", "Absent"],
             datasets: [{
                 data: [{{ $presentToday ?? 0 }}, {{ $lateToday ?? 0 }}, {{ $absentToday ?? 0 }}],
                 backgroundColor: ['#4e73df', '#f6c23e', '#e74a3b'],

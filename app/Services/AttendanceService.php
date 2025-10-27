@@ -59,11 +59,14 @@ class AttendanceService
         // Get user's work schedule
         $schedule = $this->getUserSchedule($user);
         
-        // Check if late
+        // Get office location check-in deadline
+        $officeLocation = $qrCode->officeLocation;
+        
+        // Check if late based on office deadline
         $checkInTime = now();
-        $scheduledTime = Carbon::parse($schedule->check_in_time);
-        $isLate = $checkInTime->gt($scheduledTime->addMinutes($schedule->late_tolerance));
-        $lateDuration = $isLate ? $checkInTime->diffInMinutes($scheduledTime) : 0;
+        $deadlineTime = Carbon::createFromFormat('H:i:s', $officeLocation->check_in_deadline);
+        $isLate = $checkInTime->gt($deadlineTime);
+        $lateDuration = $isLate ? $checkInTime->diffInMinutes($deadlineTime) : 0;
 
         // Create attendance record
         $attendance = Attendance::create([

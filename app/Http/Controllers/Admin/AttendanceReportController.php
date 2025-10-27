@@ -60,7 +60,7 @@ class AttendanceReportController extends Controller
         }
         
         $totalAttendance = $statsQuery->count();
-        $presentCount = $statsQuery->where('status', 'present')->count();
+        $presentCount = $statsQuery->where('status', 'on_time')->count();
         $lateCount = $statsQuery->where('status', 'late')->count();
         $absentCount = $totalAttendance - ($presentCount + $lateCount);
         

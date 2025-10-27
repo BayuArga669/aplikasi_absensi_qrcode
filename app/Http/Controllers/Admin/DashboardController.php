@@ -24,7 +24,7 @@ class DashboardController extends Controller
         // Get dashboard statistics
         $totalEmployees = User::count();
         $presentToday = Attendance::whereDate('check_in_time', Carbon::today())
-            ->where('status', 'present')
+            ->where('status', 'on_time')
             ->count();
         $lateToday = Attendance::whereDate('check_in_time', Carbon::today())
             ->where('status', 'late')

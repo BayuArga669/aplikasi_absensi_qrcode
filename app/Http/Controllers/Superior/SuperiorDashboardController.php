@@ -22,7 +22,7 @@ class SuperiorDashboardController extends Controller
         
         $presentToday = Attendance::whereDate('check_in_time', Carbon::today())
             ->whereIn('user_id', $teamIds)
-            ->where('status', 'present')
+            ->where('status', 'on_time')
             ->count();
             
         $lateToday = Attendance::whereDate('check_in_time', Carbon::today())
@@ -60,7 +60,7 @@ class SuperiorDashboardController extends Controller
             
             $present = $member->attendances()
                 ->whereBetween('check_in_time', [$monthStart, $monthEnd])
-                ->where('status', 'present')
+                ->where('status', 'on_time')
                 ->count();
                 
             $late = $member->attendances()

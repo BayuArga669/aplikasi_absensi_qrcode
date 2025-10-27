@@ -26,6 +26,7 @@
                             <th>Name</th>
                             <th>Email</th>
                             <th>Position</th>
+                            <th>Role</th>
                             <th>Superior</th>
                             <th>Status</th>
                             <th>Actions</th>
@@ -38,6 +39,18 @@
                                 <td>{{ $employee->name }}</td>
                                 <td>{{ $employee->email }}</td>
                                 <td>{{ $employee->position ?? 'N/A' }}</td>
+                                <td>
+                                    <span class="badge 
+                                        @if($employee->role === 'admin') 
+                                            bg-info 
+                                        @elseif($employee->role === 'superior') 
+                                            bg-warning 
+                                        @else 
+                                            bg-secondary 
+                                        @endif">
+                                        {{ ucfirst($employee->role) }}
+                                    </span>
+                                </td>
                                 <td>{{ $employee->superior ? $employee->superior->name : 'N/A' }}</td>
                                 <td>
                                     <span class="badge 
@@ -66,7 +79,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="7" class="text-center">No employees found.</td>
+                                <td colspan="8" class="text-center">No employees found.</td>
                             </tr>
                         @endforelse
                     </tbody>

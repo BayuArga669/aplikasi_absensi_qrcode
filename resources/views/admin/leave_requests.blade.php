@@ -37,7 +37,7 @@
                                             {{ ucfirst($request->type) }}
                                         </span>
                                     </td>
-                                    <td>{{ $request->start_date }} to {{ $request->end_date }}</td>
+                                    <td>{{ $request->start_date ? $request->start_date->format('d M Y') : '-' }} to {{ $request->end_date ? $request->end_date->format('d M Y') : '-' }}</td>
                                     <td>{{ $request->reason }}</td>
                                     <td>
                                         @if($request->attachment)
@@ -48,7 +48,7 @@
                                             <span class="text-muted">None</span>
                                         @endif
                                     </td>
-                                    <td>{{ $request->created_at->format('M d, Y H:i') }}</td>
+                                    <td>{{ $request->created_at ? $request->created_at->timezone('Asia/Jakarta')->format('d M Y H:i') : '-' }}</td>
                                     <td>
                                         <div class="btn-group" role="group">
                                             <form action="{{ route('admin.leave-requests.approve', $request->id) }}" method="POST" class="d-inline">
@@ -109,7 +109,7 @@
                                         {{ ucfirst($request->type) }}
                                     </span>
                                 </td>
-                                <td>{{ $request->start_date }} to {{ $request->end_date }}</td>
+                                <td>{{ $request->start_date ? $request->start_date->format('d M Y') : '-' }} to {{ $request->end_date ? $request->end_date->format('d M Y') : '-' }}</td>
                                 <td>{{ $request->reason }}</td>
                                 <td>
                                     <span class="badge 
@@ -119,7 +119,7 @@
                                         {{ ucfirst($request->status) }}
                                     </span>
                                 </td>
-                                <td>{{ $request->created_at->format('M d, Y') }}</td>
+                                <td>{{ $request->created_at ? $request->created_at->timezone('Asia/Jakarta')->format('d M Y') : '-' }}</td>
                                 <td>
                                     @if($request->processed_at)
                                         {{ $request->processed_at->format('M d, Y H:i') }}

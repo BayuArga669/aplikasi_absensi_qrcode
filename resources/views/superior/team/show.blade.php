@@ -41,14 +41,20 @@
                                 @forelse($attendances as $attendance)
                                     <tr>
                                         <td>{{ $attendance->date->format('Y-m-d') }}</td>
-                                        <td>{{ $attendance->check_in_time ?? '-' }}</td>
+                                        <td>{{ $attendance->check_in_time ? $attendance->check_in_time->timezone('Asia/Jakarta')->format('d M Y H:i') : '-' }}</td>
                                         <td>{{ $attendance->check_out_time ?? '-' }}</td>
                                         <td>
                                             <span class="badge 
-                                                @if($attendance->status === 'present') bg-success
+                                                @if($attendance->status === 'on_time') bg-success
                                                 @elseif($attendance->status === 'late') bg-warning
                                                 @else bg-danger @endif">
-                                                {{ ucfirst($attendance->status) }}
+                                                @if($attendance->status === 'on_time')
+                                                    <i class="fas fa-check me-1"></i>On Time
+                                                @elseif($attendance->status === 'late')
+                                                    <i class="fas fa-clock me-1"></i>Late
+                                                @else
+                                                    <i class="fas fa-times me-1"></i>{{ ucfirst(str_replace('_', ' ', $attendance->status)) }}
+                                                @endif
                                             </span>
                                         </td>
                                         <td>{{ $attendance->location ?? 'N/A' }}</td>
@@ -101,7 +107,7 @@
                                                 {{ ucfirst($request->status) }}
                                             </span>
                                         </td>
-                                        <td>{{ $request->created_at->format('M d, Y') }}</td>
+                                        <td>{{ $request->created_at ? $request->created_at->timezone('Asia/Jakarta')->format('d M Y H:i') : '-' }}</td>
                                     </tr>
                                 @empty
                                     <tr>

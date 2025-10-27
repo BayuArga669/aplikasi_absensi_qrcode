@@ -109,7 +109,7 @@
                                     @foreach($recentLateArrivals as $late)
                                         <tr>
                                             <td>{{ $late->user->name ?? 'N/A' }}</td>
-                                            <td>{{ $late->check_in_time }}</td>
+                                            <td>{{ $late->check_in_time ? $late->check_in_time->timezone('Asia/Jakarta')->format('d M Y H:i') : '-' }}</td>
                                             <td>
                                                 <span class="badge bg-warning">
                                                     {{ $late->late_duration ?? 'N/A' }}
@@ -184,13 +184,19 @@
                                         <td>{{ $member->position ?? 'N/A' }}</td>
                                         <td>
                                             <span class="badge 
-                                                @if($member->attendance_status === 'present') bg-success
+                                                @if($member->attendance_status === 'on_time') bg-success
                                                 @elseif($member->attendance_status === 'late') bg-warning
                                                 @else bg-danger @endif">
-                                                {{ ucfirst($member->attendance_status ?? 'absent') }}
+                                                @if($member->attendance_status === 'on_time')
+                                                    <i class="fas fa-check me-1"></i>On Time
+                                                @elseif($member->attendance_status === 'late')
+                                                    <i class="fas fa-clock me-1"></i>Late
+                                                @else
+                                                    <i class="fas fa-times me-1"></i>{{ ucfirst(str_replace('_', ' ', $member->attendance_status ?? 'absent')) }}
+                                                @endif
                                             </span>
                                         </td>
-                                        <td>{{ $member->check_in_time ?? '-' }}</td>
+                                        <td>{{ $member->check_in_time ? $member->check_in_time->timezone('Asia/Jakarta')->format('d M Y H:i') : '-' }}</td>
                                         <td>{{ $member->check_out_time ?? '-' }}</td>
                                         <td>
                                             @if($member->attendance_rate)

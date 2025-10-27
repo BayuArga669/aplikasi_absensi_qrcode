@@ -96,13 +96,19 @@
                     @if($todayAttendance)
                         <div class="row align-items-center">
                             <div class="col-md-4 text-center">
-                                <i class="fas fa-{{ $todayAttendance->status === 'present' ? 'check-circle text-success' : ($todayAttendance->status === 'late' ? 'clock text-warning' : 'times-circle text-danger') }} fa-5x"></i>
+                                <i class="fas fa-{{ $todayAttendance->status === 'on_time' ? 'check-circle text-success' : ($todayAttendance->status === 'late' ? 'clock text-warning' : 'times-circle text-danger') }} fa-5x"></i>
                             </div>
                             <div class="col-md-8">
-                                <h4 class="text-{{ $todayAttendance->status === 'present' ? 'success' : ($todayAttendance->status === 'late' ? 'warning' : 'danger') }} mb-3">
-                                    {{ ucfirst($todayAttendance->status) }}
+                                <h4 class="text-{{ $todayAttendance->status === 'on_time' ? 'success' : ($todayAttendance->status === 'late' ? 'warning' : 'danger') }} mb-3">
+                                    @if($todayAttendance->status === 'on_time')
+                                        <i class="fas fa-check me-2"></i>On Time
+                                    @elseif($todayAttendance->status === 'late')
+                                        <i class="fas fa-clock me-2"></i>Late
+                                    @else
+                                        <i class="fas fa-times me-2"></i>{{ ucfirst(str_replace('_', ' ', $todayAttendance->status)) }}
+                                    @endif
                                 </h4>
-                                <p class="mb-1"><strong>Check-in:</strong> {{ $todayAttendance->check_in_time ?? 'N/A' }}</p>
+                                <p class="mb-1"><strong>Check-in:</strong> {{ $todayAttendance->check_in_time ? $todayAttendance->check_in_time->timezone('Asia/Jakarta')->format('d M Y H:i') : 'N/A' }}</p>
                                 @if($todayAttendance->check_out_time)
                                     <p class="mb-1"><strong>Check-out:</strong> {{ $todayAttendance->check_out_time }}</p>
                                 @endif
@@ -145,13 +151,19 @@
                             <tbody>
                                 @forelse($recentAttendance as $attendance)
                                     <tr>
-                                        <td>{{ $attendance->check_in_time->format('M d') }}</td>
+                                        <td>{{ $attendance->check_in_time ? $attendance->check_in_time->timezone('Asia/Jakarta')->format('d M') : '-' }}</td>
                                         <td>
                                             <span class="badge 
-                                                @if($attendance->status === 'present') bg-success
+                                                @if($attendance->status === 'on_time') bg-success
                                                 @elseif($attendance->status === 'late') bg-warning
                                                 @else bg-danger @endif">
-                                                {{ ucfirst($attendance->status) }}
+                                                @if($attendance->status === 'on_time')
+                                                    <i class="fas fa-check me-1"></i>On Time
+                                                @elseif($attendance->status === 'late')
+                                                    <i class="fas fa-clock me-1"></i>Late
+                                                @else
+                                                    <i class="fas fa-times me-1"></i>{{ ucfirst(str_replace('_', ' ', $attendance->status)) }}
+                                                @endif
                                             </span>
                                         </td>
                                     </tr>

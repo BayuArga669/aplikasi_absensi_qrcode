@@ -10,7 +10,7 @@ class OfficeLocation extends Model
     use HasFactory;
 
     protected $fillable = [
-        'name', 'address', 'latitude', 'longitude', 'radius', 'is_active'
+        'name', 'address', 'latitude', 'longitude', 'radius', 'is_active', 'check_in_deadline'
     ];
 
     protected $casts = [

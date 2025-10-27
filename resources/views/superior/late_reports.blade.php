@@ -136,9 +136,9 @@
                         @forelse($lateArrivals as $late)
                             <tr>
                                 <td>{{ $late->user->name ?? 'N/A' }}</td>
-                                <td>{{ $late->check_in_time->format('Y-m-d') }}</td>
+                                <td>{{ $late->check_in_time ? $late->check_in_time->timezone('Asia/Jakarta')->format('d M Y') : '-' }}</td>
                                 <td>{{ config('app.check_in_start_time', '08:00') }}</td>
-                                <td>{{ $late->check_in_time }}</td>
+                                <td>{{ $late->check_in_time ? $late->check_in_time->timezone('Asia/Jakarta')->format('H:i') : '-' }}</td>
                                 <td>
                                     <span class="badge bg-warning">
                                         {{ $late->late_duration ?? 'N/A' }}

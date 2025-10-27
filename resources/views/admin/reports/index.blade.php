@@ -42,7 +42,7 @@
                         <label for="status" class="form-label">Status</label>
                         <select class="form-control" id="status" name="status">
                             <option value="">All Status</option>
-                            <option value="present" {{ request('status') == 'present' ? 'selected' : '' }}>Present</option>
+                            <option value="on_time" {{ request('status') == 'on_time' ? 'selected' : '' }}>On Time</option>
                             <option value="late" {{ request('status') == 'late' ? 'selected' : '' }}>Late</option>
                             <option value="absent" {{ request('status') == 'absent' ? 'selected' : '' }}>Absent</option>
                         </select>
@@ -156,15 +156,21 @@
                         @forelse($attendanceRecords as $attendance)
                             <tr>
                                 <td>{{ $attendance->user->name ?? 'N/A' }}</td>
-                                <td>{{ $attendance->check_in_time->format('Y-m-d') }}</td>
-                                <td>{{ $attendance->check_in_time ?? '-' }}</td>
+                                <td>{{ $attendance->check_in_time ? $attendance->check_in_time->timezone('Asia/Jakarta')->format('d M Y') : '-' }}</td>
+                                <td>{{ $attendance->check_in_time ? $attendance->check_in_time->timezone('Asia/Jakarta')->format('H:i') : '-' }}</td>
                                 <td>{{ $attendance->check_out_time ?? '-' }}</td>
                                 <td>
                                     <span class="attendance-status 
-                                        @if($attendance->status === 'present') status-present
+                                        @if($attendance->status === 'on_time') status-present
                                         @elseif($attendance->status === 'late') status-late
                                         @else status-absent @endif">
-                                        {{ ucfirst($attendance->status) }}
+                                        @if($attendance->status === 'on_time')
+                                            <i class="fas fa-check text-success me-1"></i>On Time
+                                        @elseif($attendance->status === 'late')
+                                            <i class="fas fa-clock text-warning me-1"></i>Late
+                                        @else
+                                            <i class="fas fa-times text-danger me-1"></i>{{ ucfirst(str_replace('_', ' ', $attendance->status)) }}
+                                        @endif
                                     </span>
                                 </td>
                                 <td>{{ $attendance->check_in_latitude ?? 'N/A' }}, {{ $attendance->check_in_longitude ?? 'N/A' }}</td>

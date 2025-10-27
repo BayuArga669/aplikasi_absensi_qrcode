@@ -46,6 +46,19 @@
                     
                     <div class="col-md-6">
                         <div class="form-group mb-3">
+                            <label for="role" class="form-label">Role</label>
+                            <select class="form-control @error('role') is-invalid @enderror" id="role" name="role" required>
+                                <option value="">Select Role</option>
+                                <option value="employee" {{ old('role') == 'employee' ? 'selected' : '' }}>Employee</option>
+                                <option value="superior" {{ old('role') == 'superior' ? 'selected' : '' }}>Superior</option>
+                                <option value="admin" {{ old('role') == 'admin' ? 'selected' : '' }}>Administrator</option>
+                            </select>
+                            @error('role')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+                        
+                        <div class="form-group mb-3">
                             <label for="position" class="form-label">Position</label>
                             <input type="text" class="form-control @error('position') is-invalid @enderror" id="position" name="position" value="{{ old('position') }}" required>
                             @error('position')

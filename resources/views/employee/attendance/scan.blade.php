@@ -18,12 +18,18 @@
                         <div class="card-body text-center">
                             @if($todayAttendance)
                                 <div class="mb-3">
-                                    <i class="fas fa-{{ $todayAttendance->status === 'present' ? 'check-circle text-success' : ($todayAttendance->status === 'late' ? 'clock text-warning' : 'times-circle text-danger') }} fa-3x"></i>
+                                    <i class="fas fa-{{ $todayAttendance->status === 'on_time' ? 'check-circle text-success' : ($todayAttendance->status === 'late' ? 'clock text-warning' : 'times-circle text-danger') }} fa-3x"></i>
                                 </div>
-                                <h4 class="text-{{ $todayAttendance->status === 'present' ? 'success' : ($todayAttendance->status === 'late' ? 'warning' : 'danger') }}">
-                                    Already Checked In
+                                <h4 class="text-{{ $todayAttendance->status === 'on_time' ? 'success' : ($todayAttendance->status === 'late' ? 'warning' : 'danger') }}">
+                                    @if($todayAttendance->status === 'on_time')
+                                        <i class="fas fa-check me-1"></i>Already Checked In
+                                    @elseif($todayAttendance->status === 'late')
+                                        <i class="fas fa-clock me-1"></i>Checked In Late
+                                    @else
+                                        <i class="fas fa-times me-1"></i>{{ ucfirst(str_replace('_', ' ', $todayAttendance->status)) }}
+                                    @endif
                                 </h4>
-                                <p class="mb-0">Check-in time: {{ $todayAttendance->check_in_time }}</p>
+                                <p class="mb-0">Check-in time: {{ $todayAttendance->check_in_time->timezone('Asia/Jakarta')->format('d M Y H:i') }}</p>
                                 <p class="text-muted">You can only check in once per day</p>
                             @else
                                 <div class="mb-3">

@@ -31,7 +31,7 @@ class DashboardController extends Controller
         
         $presentCount = $user->attendances()
             ->whereBetween('check_in_time', [$monthStart, $monthEnd])
-            ->where('status', 'present')
+            ->where('status', 'on_time')
             ->count();
             
         $lateCount = $user->attendances()

@@ -80,7 +80,7 @@ class AttendanceController extends Controller
         $attendanceRecords = $query->orderBy('check_in_time', 'desc')->paginate(20);
         
         // Calculate statistics
-        $presentCount = $user->attendances()->where('status', 'present')->count();
+        $presentCount = $user->attendances()->where('status', 'on_time')->count();
         $lateCount = $user->attendances()->where('status', 'late')->count();
         $absentCount = $user->attendances()->where('status', 'absent')->count();
         
