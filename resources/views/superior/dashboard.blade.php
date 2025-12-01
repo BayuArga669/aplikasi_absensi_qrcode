@@ -115,7 +115,7 @@
                                                     {{ $late->late_duration ?? 'N/A' }}
                                                 </span>
                                             </td>
-                                            <td>{{ $late->date->format('Y-m-d') }}</td>
+                                            <td>{{ $late->check_in_time ? $late->check_in_time->format('Y-m-d') : '-' }}</td>
                                             <td>{{ $late->location ?? 'N/A' }}</td>
                                         </tr>
                                     @endforeach
@@ -197,7 +197,7 @@
                                             </span>
                                         </td>
                                         <td>{{ $member->check_in_time ? $member->check_in_time->timezone('Asia/Jakarta')->format('d M Y H:i') : '-' }}</td>
-                                        <td>{{ $member->check_out_time ?? '-' }}</td>
+                                        <td>{{ $member->check_out_time ? $member->check_out_time->timezone('Asia/Jakarta')->format('d M Y H:i') : '-' }}</td>
                                         <td>
                                             @if($member->attendance_rate)
                                                 {{ number_format($member->attendance_rate, 1) }}%

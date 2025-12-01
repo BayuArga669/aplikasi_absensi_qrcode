@@ -28,6 +28,7 @@ class OfficeController extends Controller
             'longitude' => 'required|numeric|between:-180,180',
             'radius' => 'required|integer|min:1',
             'check_in_deadline' => 'required|date_format:H:i',
+            'check_out_deadline' => 'required|date_format:H:i',
             'is_active' => 'boolean'
         ]);
 
@@ -38,6 +39,7 @@ class OfficeController extends Controller
             'longitude' => $request->longitude,
             'radius' => $request->radius,
             'check_in_deadline' => $request->check_in_deadline,
+            'check_out_deadline' => $request->check_out_deadline,
             'is_active' => $request->boolean('is_active', true) // Default to true if not provided
         ]);
 
@@ -59,6 +61,7 @@ class OfficeController extends Controller
             'longitude' => 'required|numeric|between:-180,180',
             'radius' => 'required|integer|min:1',
             'check_in_deadline' => 'required|date_format:H:i',
+            'check_out_deadline' => 'required|date_format:H:i',
             'is_active' => 'boolean'
         ]);
 
@@ -71,6 +74,7 @@ class OfficeController extends Controller
             'longitude' => $request->longitude,
             'radius' => $request->radius,
             'check_in_deadline' => $request->check_in_deadline,
+            'check_out_deadline' => $request->check_out_deadline,
             'is_active' => $request->boolean('is_active', true) // Default to true if not provided
         ]);
 

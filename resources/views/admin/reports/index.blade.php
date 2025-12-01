@@ -53,7 +53,7 @@
                             <button type="submit" class="btn btn-primary">Filter</button>
                             <a href="{{ route('admin.reports.index') }}" class="btn btn-secondary">Reset</a>
                             <button type="button" class="btn btn-success" onclick="exportReport()">
-                                <i class="fas fa-file-export me-2"></i>Export
+                                <i class="fas fa-file-excel me-2"></i>Export to Excel
                             </button>
                         </div>
                     </div>
@@ -196,8 +196,26 @@
 
 <script>
     function exportReport() {
-        // In a real implementation, this would send the form data to an export endpoint
-        alert('Export functionality would be implemented here to generate Excel/PDF reports');
+        // Collect form data
+        const startDate = document.getElementById('start_date')?.value;
+        const endDate = document.getElementById('end_date')?.value;
+        const employeeId = document.getElementById('employee_id')?.value;
+        const status = document.getElementById('status')?.value;
+        const department = document.getElementById('department')?.value;
+
+        // Build query string with current filter values
+        let queryString = '?';
+        if(startDate) queryString += 'start_date=' + encodeURIComponent(startDate) + '&';
+        if(endDate) queryString += 'end_date=' + encodeURIComponent(endDate) + '&';
+        if(employeeId) queryString += 'employee_id=' + encodeURIComponent(employeeId) + '&';
+        if(status) queryString += 'status=' + encodeURIComponent(status) + '&';
+        if(department) queryString += 'department=' + encodeURIComponent(department) + '&';
+
+        // Remove trailing &
+        queryString = queryString.slice(0, -1);
+
+        // Redirect to export route with filters
+        window.location.href = '{{ route('admin.reports.export') }}' + queryString;
     }
 </script>
 @endsection

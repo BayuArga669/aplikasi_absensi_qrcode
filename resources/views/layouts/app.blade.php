@@ -225,6 +225,9 @@
                         <a href="{{ route('superior.team.index') }}" class="list-group-item list-group-item-action {{ Request::is('superior/team*') ? 'active' : '' }}">
                             <i class="fas fa-users me-2"></i>Team Monitoring
                         </a>
+                        <a href="{{ route('superior.leave-requests.index') }}" class="list-group-item list-group-item-action {{ Request::is('superior/leave-requests*') ? 'active' : '' }}">
+                            <i class="fas fa-file-alt me-2"></i>Leave Requests
+                        </a>
                         <a href="{{ route('superior.late-reports') }}" class="list-group-item list-group-item-action {{ Request::is('superior/reports*') ? 'active' : '' }}">
                             <i class="fas fa-clock me-2"></i>Late Reports
                         </a>

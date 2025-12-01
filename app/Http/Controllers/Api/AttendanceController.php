@@ -53,12 +53,24 @@ class AttendanceController extends Controller
     public function checkOut(Request $request)
     {
         $request->validate([
+            'qr_code' => 'required|string',
             'latitude' => 'required|numeric',
             'longitude' => 'required|numeric',
         ]);
 
+        // Validate QR code
+        $qrCode = $this->qrCodeService->validateQrCode($request->qr_code);
+
+        if (!$qrCode) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Invalid or expired QR code',
+            ], 400);
+        }
+
         $result = $this->attendanceService->checkOut(
             $request->user(),
+            $qrCode,
             $request->latitude,
             $request->longitude
         );

@@ -12,26 +12,52 @@
     <div class="row flex-column flex-md-row">
         <div class="col-lg-12">
             <div class="row flex-column flex-md-row">
-                <!-- Check-in Status Card -->
+                <!-- Check-in/Check-out Status Card -->
                 <div class="col-xl-4 col-lg-5 col-12">
                     <div class="card shadow mb-4">
                         <div class="card-body text-center">
                             @if($todayAttendance)
-                                <div class="mb-3">
-                                    <i class="fas fa-{{ $todayAttendance->status === 'on_time' ? 'check-circle text-success' : ($todayAttendance->status === 'late' ? 'clock text-warning' : 'times-circle text-danger') }} fa-3x"></i>
-                                </div>
-                                <h4 class="text-{{ $todayAttendance->status === 'on_time' ? 'success' : ($todayAttendance->status === 'late' ? 'warning' : 'danger') }}">
-                                    @if($todayAttendance->status === 'on_time')
-                                        <i class="fas fa-check me-1"></i>Already Checked In
-                                    @elseif($todayAttendance->status === 'late')
-                                        <i class="fas fa-clock me-1"></i>Checked In Late
+                                @if($todayAttendance->check_out_time)
+                                    <!-- Already checked out -->
+                                    <div class="mb-3">
+                                        <i class="fas fa-check-circle text-success fa-3x"></i>
+                                    </div>
+                                    <h4 class="text-success">
+                                        <i class="fas fa-check me-1"></i>Already Checked Out
+                                    </h4>
+                                    <p class="mb-0">Check-in: {{ $todayAttendance->check_in_time->timezone('Asia/Jakarta')->format('d M Y H:i') }}</p>
+                                    <p class="mb-0">Check-out: {{ $todayAttendance->check_out_time->timezone('Asia/Jakarta')->format('d M Y H:i') }}</p>
+                                    <p class="text-muted">Attendance completed for today</p>
+                                @else
+                                    <!-- Checked in but not checked out yet -->
+                                    <div class="mb-3">
+                                        <i class="fas fa-clock text-warning fa-3x"></i>
+                                    </div>
+                                    <h4 class="text-warning">
+                                        <i class="fas fa-clock me-1"></i>Checked In
+                                    </h4>
+                                    <p class="mb-0">Check-in: {{ $todayAttendance->check_in_time->timezone('Asia/Jakarta')->format('d M Y H:i') }}</p>
+                                    @if($officeLocation && $officeLocation->check_out_deadline)
+                                        @php
+                                            $checkOutDeadline = \Carbon\Carbon::today()->setTime(substr($officeLocation->check_out_deadline, 0, 2), substr($officeLocation->check_out_deadline, 3, 2));
+                                            $currentTime = \Carbon\Carbon::now();
+                                            $canCheckOut = $currentTime->gte($checkOutDeadline);
+                                            $timeRemaining = $currentTime->diff($checkOutDeadline);
+                                            $timeRemainingText = $timeRemaining->h . ' hours ' . $timeRemaining->i . ' minutes';
+                                        @endphp
+                                        @if($canCheckOut)
+                                            <p class="text-success mb-0">Check-out time: Anytime after {{ $checkOutDeadline->format('H:i') }}</p>
+                                            <p class="text-success">You can check out now</p>
+                                        @else
+                                            <p class="text-info mb-0">Check-out start time: {{ $checkOutDeadline->format('H:i') }}</p>
+                                            <p class="text-warning">Time remaining: {{ $timeRemainingText }}</p>
+                                        @endif
                                     @else
-                                        <i class="fas fa-times me-1"></i>{{ ucfirst(str_replace('_', ' ', $todayAttendance->status)) }}
+                                        <p class="text-muted">Scan QR code to check out</p>
                                     @endif
-                                </h4>
-                                <p class="mb-0">Check-in time: {{ $todayAttendance->check_in_time->timezone('Asia/Jakarta')->format('d M Y H:i') }}</p>
-                                <p class="text-muted">You can only check in once per day</p>
+                                @endif
                             @else
+                                <!-- Not checked in yet -->
                                 <div class="mb-3">
                                     <i class="fas fa-qrcode fa-3x text-primary"></i>
                                 </div>
@@ -51,20 +77,57 @@
                         <div class="card-body">
                             <div id="reader" class="border rounded overflow-hidden">
                                 @if(!$todayAttendance)
+                                    <!-- Check-in scanner -->
                                     <div class="text-center p-5" id="cameraPlaceholder">
                                         <i class="fas fa-camera fa-5x text-muted mb-3"></i>
                                         <p class="text-muted">Camera will activate after permission is granted</p>
                                         <button id="startCamera" class="btn btn-primary">Start Camera</button>
                                     </div>
+                                @elseif($todayAttendance && !$todayAttendance->check_out_time)
+                                    @if($officeLocation && $officeLocation->check_out_deadline)
+                                        @php
+                                            $checkOutDeadline = \Carbon\Carbon::today()->setTime(substr($officeLocation->check_out_deadline, 0, 2), substr($officeLocation->check_out_deadline, 3, 2));
+                                            $currentTime = \Carbon\Carbon::now();
+                                            $canCheckOut = $currentTime->gte($checkOutDeadline);
+                                        @endphp
+                                        @if(!$canCheckOut)
+                                            <!-- Check-out not yet allowed -->
+                                            <div class="text-center p-5">
+                                                <i class="fas fa-clock fa-5x text-warning mb-3"></i>
+                                                <p class="text-warning">Check-out is not allowed before {{ $checkOutDeadline->format('H:i') }}</p>
+                                                @php
+                                                    $timeRemaining = $currentTime->diff($checkOutDeadline);
+                                                    $timeRemainingText = $timeRemaining->h . ' hours ' . $timeRemaining->i . ' minutes';
+                                                @endphp
+                                                <p class="text-info">Time remaining: {{ $timeRemainingText }}</p>
+                                            </div>
+                                        @else
+                                            <!-- Check-out scanner -->
+                                            <div class="text-center p-5" id="cameraPlaceholder">
+                                                <i class="fas fa-camera fa-5x text-muted mb-3"></i>
+                                                <p class="text-muted">Camera will activate after permission is granted</p>
+                                                <button id="startCamera" class="btn btn-primary">Start Camera</button>
+                                            </div>
+                                        @endif
+                                    @else
+                                        <!-- Check-out scanner -->
+                                        <div class="text-center p-5" id="cameraPlaceholder">
+                                            <i class="fas fa-camera fa-5x text-muted mb-3"></i>
+                                            <p class="text-muted">Camera will activate after permission is granted</p>
+                                            <button id="startCamera" class="btn btn-primary">Start Camera</button>
+                                        </div>
+                                    @endif
                                 @else
+                                    <!-- Already checked out -->
                                     <div class="text-center p-5">
-                                        <i class="fas fa-ban fa-5x text-muted mb-3"></i>
-                                        <p class="text-muted">Check-in already completed for today</p>
+                                        <i class="fas fa-check-circle fa-5x text-muted mb-3"></i>
+                                        <p class="text-muted">Attendance completed for today</p>
                                     </div>
                                 @endif
                             </div>
                             
                             @if(!$todayAttendance)
+                                <!-- Check-in form -->
                                 <div class="mt-3">
                                     <div class="alert alert-info">
                                         <i class="fas fa-info-circle me-2"></i>
@@ -80,6 +143,58 @@
                                         <i class="fas fa-check me-2"></i>Check In Manually
                                     </button>
                                 </div>
+                            @elseif($todayAttendance && !$todayAttendance->check_out_time)
+                                @if($officeLocation && $officeLocation->check_out_deadline)
+                                    @php
+                                        $checkOutDeadline = \Carbon\Carbon::today()->setTime(substr($officeLocation->check_out_deadline, 0, 2), substr($officeLocation->check_out_deadline, 3, 2));
+                                        $currentTime = \Carbon\Carbon::now();
+                                        $canCheckOut = $currentTime->gte($checkOutDeadline);
+                                    @endphp
+                                    @if(!$canCheckOut)
+                                        <!-- Check-out not yet allowed -->
+                                        <div class="mt-3">
+                                            <div class="alert alert-warning">
+                                                <i class="fas fa-exclamation-triangle me-2"></i>
+                                                Check-out is not allowed before {{ $checkOutDeadline->format('H:i') }}.
+                                                Time remaining: {{ $currentTime->diff($checkOutDeadline)->h }} hours {{ $currentTime->diff($checkOutDeadline)->i }} minutes.
+                                            </div>
+                                        </div>
+                                    @else
+                                        <!-- Check-out form -->
+                                        <div class="mt-3">
+                                            <div class="alert alert-info">
+                                                <i class="fas fa-info-circle me-2"></i>
+                                                Make sure you are within the office area to ensure location validation passes.
+                                            </div>
+
+                                            <div class="form-group mb-3">
+                                                <label for="manualCheckOut">Or enter the QR code manually:</label>
+                                                <input type="text" class="form-control" id="manualCheckOut" placeholder="Enter QR code value">
+                                            </div>
+
+                                            <button id="manualCheckOutBtn" class="btn btn-success w-100" disabled>
+                                                <i class="fas fa-sign-out-alt me-2"></i>Check Out Manually
+                                            </button>
+                                        </div>
+                                    @endif
+                                @else
+                                    <!-- Check-out form -->
+                                    <div class="mt-3">
+                                        <div class="alert alert-info">
+                                            <i class="fas fa-info-circle me-2"></i>
+                                            Make sure you are within the office area to ensure location validation passes.
+                                        </div>
+
+                                        <div class="form-group mb-3">
+                                            <label for="manualCheckOut">Or enter the QR code manually:</label>
+                                            <input type="text" class="form-control" id="manualCheckOut" placeholder="Enter QR code value">
+                                        </div>
+
+                                        <button id="manualCheckOutBtn" class="btn btn-success w-100" disabled>
+                                            <i class="fas fa-sign-out-alt me-2"></i>Check Out Manually
+                                        </button>
+                                    </div>
+                                @endif
                             @endif
                         </div>
                     </div>
@@ -130,7 +245,7 @@
     @endif
     let locationAccuracy = 0;
     
-    // Get user's location
+        // Get user's location
     function getCurrentLocation() {
         const locationStatus = document.getElementById('locationStatus');
         const currentLocationEl = document.getElementById('currentLocation');
@@ -173,9 +288,17 @@
                         locationProgress.className = 'progress-bar bg-danger';
                     }
                     
-                    // If we're within office, we can enable check-in
-                    if (distance <= officeRadius && !{{ $todayAttendance ? 'true' : 'false' }}) {
-                        document.getElementById('manualCheckInBtn').disabled = false;
+                    // If we're within office, we can enable check-in or check-out
+                    const hasAttendance = @json($todayAttendance ? true : false);
+                    const todayAttendance = @json($todayAttendance);
+                    const canCheckOut = todayAttendance && !todayAttendance.check_out_time;
+                    
+                    if (distance <= officeRadius) {
+                        if (!hasAttendance) {
+                            document.getElementById('manualCheckInBtn').disabled = false;
+                        } else if (canCheckOut) {
+                            document.getElementById('manualCheckOutBtn').disabled = false;
+                        }
                     }
                 },
                 function(error) {
@@ -198,7 +321,6 @@
             locationAccuracyEl.textContent = 'Please use a modern browser';
         }
     }
-    
     // Calculate distance between two points (in meters)
     function calculateDistance(point1, point2) {
         const R = 6371e3; // Earth's radius in meters
@@ -253,36 +375,90 @@
                         
                         if (code) {
                             // QR code detected
-                            document.getElementById('manualCheckIn').value = code.data;
-                            document.getElementById('result').innerHTML = `<span class="text-success">QR Code detected: ${code.data.substring(0, 20)}...</span>`;
+                            const todayAttendance = @json($todayAttendance);
                             
-                            // Automatically process check-in if location is valid
-                            if (currentLocation) {
-                                fetch('/employee/attendance/check-in', {
-                                    method: 'POST',
-                                    headers: {
-                                        'Content-Type': 'application/json',
-                                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-                                    },
-                                    body: JSON.stringify({
-                                        qr_code: code.data,
-                                        latitude: currentLocation.lat,
-                                        longitude: currentLocation.lng
+                            if (!todayAttendance) {
+                                // Check-in mode
+                                document.getElementById('manualCheckIn').value = code.data;
+                                document.getElementById('result').innerHTML = `<span class="text-success">QR Code detected: ${code.data.substring(0, 20)}...</span>`;
+                                
+                                // Process check-in if location is valid
+                                if (currentLocation) {
+                                    fetch('/employee/attendance/check-in', {
+                                        method: 'POST',
+                                        headers: {
+                                            'Content-Type': 'application/json',
+                                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                                        },
+                                        body: JSON.stringify({
+                                            qr_code: code.data,
+                                            latitude: currentLocation.lat,
+                                            longitude: currentLocation.lng
+                                        })
                                     })
-                                })
-                                .then(response => response.json())
-                                .then(data => {
-                                    if (data.success) {
-                                        document.getElementById('result').innerHTML = '<span class="text-success">Check-in successful!</span>';
-                                        setTimeout(() => location.reload(), 1500);
-                                    } else {
-                                        document.getElementById('result').innerHTML = `<span class="text-danger">Check-in failed: ${data.message}</span>`;
-                                    }
-                                })
-                                .catch(error => {
-                                    console.error('Error:', error);
-                                    document.getElementById('result').innerHTML = '<span class="text-danger">An error occurred during check-in</span>';
-                                });
+                                    .then(response => response.json())
+                                    .then(data => {
+                                        if (data.success) {
+                                            document.getElementById('result').innerHTML = '<span class="text-success">' + data.message + '!</span>';
+                                            setTimeout(() => location.reload(), 1500);
+                                        } else {
+                                            document.getElementById('result').innerHTML = `<span class="text-danger">Check-in failed: ${data.message}</span>`;
+                                        }
+                                    })
+                                    .catch(error => {
+                                        console.error('Error:', error);
+                                        document.getElementById('result').innerHTML = '<span class="text-danger">An error occurred during check-in</span>';
+                                    });
+                                }
+                            } else if (todayAttendance && !todayAttendance.check_out_time) {
+                                // Check if user can check out based on office deadline
+                                @if($officeLocation && $officeLocation->check_out_deadline)
+                                    @php
+                                        $checkOutDeadline = \Carbon\Carbon::today()->setTime(substr($officeLocation->check_out_deadline, 0, 2), substr($officeLocation->check_out_deadline, 3, 2));
+                                        $currentTime = \Carbon\Carbon::now();
+                                        $canCheckOut = $currentTime->gte($checkOutDeadline);
+                                    @endphp
+                                    @if(!$canCheckOut)
+                                        document.getElementById('result').innerHTML = `<span class="text-warning">Check-out is not allowed before {{ $checkOutDeadline->format('H:i') }}. Time remaining: {{ $currentTime->diff($checkOutDeadline)->h }} hours {{ $currentTime->diff($checkOutDeadline)->i }} minutes.</span>`;
+                                        return; // Exit the function early
+                                    @endif
+                                @endif
+
+                                // Check-out mode
+                                document.getElementById('manualCheckOut').value = code.data;
+                                document.getElementById('result').innerHTML = `<span class="text-success">QR Code detected: ${code.data.substring(0, 20)}...</span>`;
+
+                                // Process check-out if location is valid
+                                if (currentLocation) {
+                                    fetch('/employee/attendance/check-out', {
+                                        method: 'POST',
+                                        headers: {
+                                            'Content-Type': 'application/json',
+                                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                                        },
+                                        body: JSON.stringify({
+                                            qr_code: code.data,
+                                            latitude: currentLocation.lat,
+                                            longitude: currentLocation.lng
+                                        })
+                                    })
+                                    .then(response => response.json())
+                                    .then(data => {
+                                        if (data.success) {
+                                            document.getElementById('result').innerHTML = '<span class="text-success">' + data.message + '!</span>';
+                                            setTimeout(() => location.reload(), 1500);
+                                        } else {
+                                            document.getElementById('result').innerHTML = `<span class="text-danger">Check-out failed: ${data.message}</span>`;
+                                        }
+                                    })
+                                    .catch(error => {
+                                        console.error('Error:', error);
+                                        document.getElementById('result').innerHTML = '<span class="text-danger">An error occurred during check-out</span>';
+                                    });
+                                }
+                            } else {
+                                // Already checked out
+                                document.getElementById('result').innerHTML = '<span class="text-info">Attendance completed for today</span>';
                             }
                         }
                         
@@ -325,8 +501,9 @@
         document.getElementById('manualCheckIn').addEventListener('input', function() {
             const qrValue = this.value.trim();
             const checkInBtn = document.getElementById('manualCheckInBtn');
+            const hasAttendance = @json($todayAttendance ? true : false);
             
-            if (qrValue.length > 0 && !{{ $todayAttendance ? 'true' : 'false' }}) {
+            if (qrValue.length > 0 && !hasAttendance) {
                 checkInBtn.disabled = false;
             } else {
                 checkInBtn.disabled = true;
@@ -336,8 +513,6 @@
         document.getElementById('manualCheckInBtn').addEventListener('click', function() {
             const qrValue = document.getElementById('manualCheckIn').value.trim();
             if (qrValue) {
-                // In a real implementation, this would make an API call to record attendance
-                // Send QR code and location to server
                 fetch('/employee/attendance/check-in', {
                     method: 'POST',
                     headers: {
@@ -353,8 +528,8 @@
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
-                        alert('Check-in successful!');
-                        location.reload(); // Refresh the page to show the updated status
+                        alert(data.message);
+                        location.reload();
                     } else {
                         alert('Check-in failed: ' + data.message);
                     }
@@ -362,6 +537,64 @@
                 .catch(error => {
                     console.error('Error:', error);
                     alert('An error occurred during check-in');
+                });
+            }
+        });
+        
+        // Manual check-out handling
+        document.getElementById('manualCheckOut').addEventListener('input', function() {
+            const qrValue = this.value.trim();
+            const checkOutBtn = document.getElementById('manualCheckOutBtn');
+            const todayAttendance = @json($todayAttendance);
+            const canCheckOut = todayAttendance && !todayAttendance.check_out_time;
+            
+            if (qrValue.length > 0 && canCheckOut) {
+                checkOutBtn.disabled = false;
+            } else {
+                checkOutBtn.disabled = true;
+            }
+        });
+        
+        document.getElementById('manualCheckOutBtn').addEventListener('click', function() {
+            // Check if user can check out based on office deadline
+            @if($officeLocation && $officeLocation->check_out_deadline)
+                @php
+                    $checkOutDeadline = \Carbon\Carbon::today()->setTime(substr($officeLocation->check_out_deadline, 0, 2), substr($officeLocation->check_out_deadline, 3, 2));
+                    $currentTime = \Carbon\Carbon::now();
+                    $canCheckOut = $currentTime->gte($checkOutDeadline);
+                @endphp
+                @if(!$canCheckOut)
+                    alert('Check-out is not allowed before {{ $checkOutDeadline->format('H:i') }}. Time remaining: {{ $currentTime->diff($checkOutDeadline)->h }} hours {{ $currentTime->diff($checkOutDeadline)->i }} minutes.');
+                    return; // Exit the function early
+                @endif
+            @endif
+
+            const qrValue = document.getElementById('manualCheckOut').value.trim();
+            if (qrValue) {
+                fetch('/employee/attendance/check-out', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                    },
+                    body: JSON.stringify({
+                        qr_code: qrValue,
+                        latitude: currentLocation.lat,
+                        longitude: currentLocation.lng
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert(data.message);
+                        location.reload();
+                    } else {
+                        alert('Check-out failed: ' + data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('An error occurred during check-out');
                 });
             }
         });

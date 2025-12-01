@@ -57,6 +57,9 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
         Route::get('/weekly', [AttendanceReportController::class, 'weekly'])->name('weekly');
         Route::get('/monthly', [AttendanceReportController::class, 'monthly'])->name('monthly');
         Route::get('/export', [AttendanceReportController::class, 'export'])->name('export');
+        Route::get('/export/daily', [AttendanceReportController::class, 'exportDaily'])->name('export.daily');
+        Route::get('/export/weekly', [AttendanceReportController::class, 'exportWeekly'])->name('export.weekly');
+        Route::get('/export/monthly', [AttendanceReportController::class, 'exportMonthly'])->name('export.monthly');
     });
     
     // Leave Request Management
@@ -77,9 +80,17 @@ Route::middleware(['auth', 'role:superior'])->prefix('superior')->name('superior
         Route::get('/', [TeamController::class, 'index'])->name('index');
         Route::get('/{id}', [TeamController::class, 'show'])->name('show');
     });
+
+    // Leave request management
+    Route::prefix('leave-requests')->name('leave-requests.')->group(function () {
+        Route::get('/', 'App\Http\Controllers\Superior\SuperiorLeaveRequestController@index')->name('index');
+        Route::post('/{id}/approve', 'App\Http\Controllers\Superior\SuperiorLeaveRequestController@approve')->name('approve');
+        Route::put('/{id}/reject', 'App\Http\Controllers\Superior\SuperiorLeaveRequestController@reject')->name('reject');
+    });
     
     // Late reports
     Route::get('/late-reports', [LateReportController::class, 'index'])->name('late-reports');
+    Route::get('/late-reports/export', [LateReportController::class, 'export'])->name('late-reports.export');
 });
 
 // Employee routes
@@ -90,7 +101,9 @@ Route::middleware(['auth', 'role:employee'])->prefix('employee')->name('employee
     Route::prefix('attendance')->name('attendance.')->group(function () {
         Route::get('/scan', [AttendanceController::class, 'scan'])->name('scan');
         Route::post('/check-in', [AttendanceController::class, 'checkIn'])->name('check-in');
+        Route::post('/check-out', [AttendanceController::class, 'checkOut'])->name('check-out');
         Route::get('/history', [AttendanceController::class, 'history'])->name('history');
+        Route::get('/export', [AttendanceController::class, 'exportHistory'])->name('export');
     });
     
     // Leave requests

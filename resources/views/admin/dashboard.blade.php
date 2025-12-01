@@ -4,7 +4,7 @@
 <div class="container-fluid px-4">
     <div class="d-sm-flex align-items-center justify-content-between mb-4">
         <h1 class="h3 mb-0 text-gray-800">Admin Dashboard</h1>
-        <a href="#" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm">
+        <a href="{{ route('admin.reports.index') }}" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm">
             <i class="fas fa-download fa-sm text-white-50"></i> Generate Report
         </a>
     </div>
@@ -86,71 +86,55 @@
 
     <!-- Content Row -->
     <div class="row">
-        <!-- Area Chart -->
-        <div class="col-xl-8 col-lg-7 col-md-12">
-            <div class="card shadow mb-4">
-                <!-- Card Header - Dropdown -->
-                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                    <h6 class="m-0 font-weight-bold text-primary">Attendance Overview</h6>
-                    <div class="dropdown no-arrow">
-                        <a class="dropdown-toggle" href="#" role="button" id="dropdownMenuLink"
-                            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-400"></i>
-                        </a>
-                        <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in"
-                            aria-labelledby="dropdownMenuLink">
-                            <div class="dropdown-header">Dropdown Header:</div>
-                            <a class="dropdown-item" href="#">Action</a>
-                            <a class="dropdown-item" href="#">Another action</a>
-                            <div class="dropdown-divider"></div>
-                            <a class="dropdown-item" href="#">Something else here</a>
-                        </div>
-                    </div>
-                </div>
-                <!-- Card Body -->
+        <!-- Employee Distribution -->
+        <div class="col-xl-4 col-md-6 mb-4">
+            <div class="card border-left-info shadow h-100 py-2">
                 <div class="card-body">
-                    <div class="chart-area">
-                        <canvas id="myAreaChart"></canvas>
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
+                                Active Employees</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ $activeEmployees ?? 0 }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-user-check fa-2x text-gray-300"></i>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Pie Chart -->
-        <div class="col-xl-4 col-lg-5 col-md-12">
-            <div class="card shadow mb-4">
-                <!-- Card Header - Dropdown -->
-                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                    <h6 class="m-0 font-weight-bold text-primary">Attendance Breakdown</h6>
-                    <div class="dropdown no-arrow">
-                        <a class="dropdown-toggle" href="#" role="button" id="dropdownMenuAlternative"
-                            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-400"></i>
-                        </a>
-                        <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in"
-                            aria-labelledby="dropdownMenuAlternative">
-                            <a class="dropdown-item" href="#">Action</a>
-                            <a class="dropdown-item" href="#">Another action</a>
-                            <div class="dropdown-divider"></div>
-                            <a class="dropdown-item" href="#">Something else here</a>
+        <!-- Employees by Department -->
+        <div class="col-xl-4 col-md-6 mb-4">
+            <div class="card border-left-secondary shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-secondary text-uppercase mb-1">
+                                Employee Departments</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ $departmentsCount ?? 0 }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-building fa-2x text-gray-300"></i>
                         </div>
                     </div>
                 </div>
-                <!-- Card Body -->
+            </div>
+        </div>
+
+        <!-- Total Offices -->
+        <div class="col-xl-4 col-md-6 mb-4">
+            <div class="card border-left-dark shadow h-100 py-2">
                 <div class="card-body">
-                    <div class="chart-pie pt-4 pb-2">
-                        <canvas id="myPieChart"></canvas>
-                    </div>
-                    <div class="mt-4 text-center small">
-                        <span class="mr-2">
-                            <i class="fas fa-circle text-primary"></i> On Time
-                        </span>
-                        <span class="mr-2">
-                            <i class="fas fa-circle text-warning"></i> Late
-                        </span>
-                        <span class="mr-2">
-                            <i class="fas fa-circle text-danger"></i> Absent
-                        </span>
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-dark text-uppercase mb-1">
+                                Active Offices</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ $activeOffices ?? 0 }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-map-marker-alt fa-2x text-gray-300"></i>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -162,8 +146,9 @@
         <!-- Recent Activity -->
         <div class="col-lg-6 col-md-12 mb-4">
             <div class="card shadow mb-4">
-                <div class="card-header py-3">
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
                     <h6 class="m-0 font-weight-bold text-primary">Recent Attendance</h6>
+                    <a href="{{ route('admin.reports.index') }}" class="m-0 font-weight-bold text-primary">View All</a>
                 </div>
                 <div class="card-body">
                     @if(isset($recentAttendance) && count($recentAttendance) > 0)
@@ -183,7 +168,7 @@
                                             </div>
                                         </div>
                                         <div class="col-12 col-sm-4 text-right mt-2 mt-sm-0">
-                                            <span class="badge 
+                                            <span class="badge
                                                 @if($attendance->status === 'on_time') badge-success
                                                 @elseif($attendance->status === 'late') badge-warning
                                                 @else badge-danger @endif">
@@ -210,8 +195,9 @@
         <!-- Recent Leave Requests -->
         <div class="col-lg-6 col-md-12 mb-4">
             <div class="card shadow mb-4">
-                <div class="card-header py-3">
-                    <h6 class="m-0 font-weight-bold text-primary">Recent Leave Requests</h6>
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                    <h6 class="m-0 font-weight-bold text-warning">Recent Leave Requests</h6>
+                    <a href="{{ route('admin.leave-requests') }}" class="m-0 font-weight-bold text-warning">View All</a>
                 </div>
                 <div class="card-body">
                     @if(isset($recentLeaveRequests) && count($recentLeaveRequests) > 0)
@@ -228,7 +214,7 @@
                                             </div>
                                         </div>
                                         <div class="col-12 col-sm-4 text-right mt-2 mt-sm-0">
-                                            <span class="badge 
+                                            <span class="badge
                                                 @if($request->status === 'pending') badge-warning
                                                 @elseif($request->status === 'approved') badge-success
                                                 @else badge-danger @endif">
@@ -246,121 +232,81 @@
             </div>
         </div>
     </div>
+
+    <!-- Content Row -->
+    <div class="row">
+        <!-- Top Late Arrivals -->
+        <div class="col-lg-6 mb-4">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                    <h6 class="m-0 font-weight-bold text-danger">Top Late Arrivals (This Week)</h6>
+                </div>
+                <div class="card-body">
+                    @if(isset($topLateArrivals) && count($topLateArrivals) > 0)
+                        <ul class="list-group list-group-flush">
+                            @foreach($topLateArrivals as $late)
+                                <li class="list-group-item">
+                                    <div class="row">
+                                        <div class="col-8">
+                                            <div class="font-weight-bold">
+                                                {{ $late['name'] ?? 'N/A' }}
+                                            </div>
+                                            <div class="text-muted small">
+                                                Late Arrivals: {{ $late['count'] }}
+                                            </div>
+                                        </div>
+                                        <div class="col-4 text-right">
+                                            <span class="badge badge-danger">
+                                                <i class="fas fa-clock"></i> {{ $late['count'] }}
+                                            </span>
+                                        </div>
+                                    </div>
+                                </li>
+                            @endforeach
+                        </ul>
+                    @else
+                        <p class="text-muted text-center">No late arrivals this week.</p>
+                    @endif
+                </div>
+            </div>
+        </div>
+
+        <!-- QR Code Activity -->
+        <div class="col-lg-6 mb-4">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                    <h6 class="m-0 font-weight-bold text-success">Recent QR Code Generations</h6>
+                </div>
+                <div class="card-body">
+                    @if(isset($recentQrCodes) && count($recentQrCodes) > 0)
+                        <ul class="list-group list-group-flush">
+                            @foreach($recentQrCodes as $qr)
+                                <li class="list-group-item">
+                                    <div class="row">
+                                        <div class="col-8">
+                                            <div class="font-weight-bold">
+                                                {{ $qr->officeLocation->name ?? 'Office QR' }}
+                                            </div>
+                                            <div class="text-muted small">
+                                                Generated: {{ $qr->created_at->timezone('Asia/Jakarta')->format('d M Y H:i') }}
+                                            </div>
+                                        </div>
+                                        <div class="col-4 text-right">
+                                            <span class="badge badge-success">
+                                                <i class="fas fa-qrcode"></i> Active
+                                            </span>
+                                        </div>
+                                    </div>
+                                </li>
+                            @endforeach
+                        </ul>
+                    @else
+                        <p class="text-muted text-center">No recent QR codes generated.</p>
+                    @endif
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script>
-    // Set new default font family and font color to mimic Bootstrap's default styling
-    Chart.defaults.global.defaultFontFamily = 'Nunito', '-apple-system,system-ui,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif';
-    Chart.defaults.global.defaultFontColor = '#858796';
-
-    // Area Chart Example
-    var ctx = document.getElementById("myAreaChart");
-    var myLineChart = new Chart(ctx, {
-        type: 'line',
-        data: {
-            labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
-            datasets: [{
-                label: "Attendance",
-                lineTension: 0.3,
-                backgroundColor: "rgba(78, 115, 223, 0.05)",
-                borderColor: "rgba(78, 115, 223, 1)",
-                pointRadius: 3,
-                pointBackgroundColor: "rgba(78, 115, 223, 1)",
-                pointBorderColor: "rgba(78, 115, 223, 1)",
-                pointHoverRadius: 3,
-                pointHoverBackgroundColor: "rgba(78, 115, 223, 1)",
-                pointHoverBorderColor: "rgba(78, 115, 223, 1)",
-                pointHitRadius: 10,
-                pointBorderWidth: 2,
-                data: [0, 10000, 5000, 15000, 10000, 20000, 15000, 25000, 20000, 30000, 25000, 40000],
-            }],
-        },
-        options: {
-            maintainAspectRatio: false,
-            layout: {
-                padding: {
-                    left: 10,
-                    right: 25,
-                    top: 25,
-                    bottom: 0
-                }
-            },
-            scales: {
-                xAxes: [{
-                    gridLines: {
-                        display: false,
-                        drawBorder: false
-                    },
-                    ticks: {
-                        maxTicksLimit: 7
-                    }
-                }],
-                yAxes: [{
-                    ticks: {
-                        maxTicksLimit: 5,
-                        padding: 10,
-                    },
-                    gridLines: {
-                        color: "rgb(234, 236, 244)",
-                        zeroLineColor: "rgb(234, 236, 244)",
-                        drawBorder: false,
-                        borderDash: [2],
-                        zeroLineBorderDash: [2]
-                    }
-                }],
-            },
-            legend: {
-                display: false
-            },
-            tooltips: {
-                backgroundColor: "rgb(255,255,255)",
-                bodyFontColor: "#858796",
-                titleMarginBottom: 10,
-                titleFontColor: '#6e707e',
-                titleFontSize: 14,
-                borderColor: '#dddfeb',
-                borderWidth: 1,
-                xPadding: 15,
-                yPadding: 15,
-                displayColors: false,
-                intersect: false,
-                mode: 'index',
-                caretPadding: 10,
-            }
-        }
-    });
-
-    // Pie Chart Example
-    var ctx = document.getElementById("myPieChart");
-    var myPieChart = new Chart(ctx, {
-        type: 'doughnut',
-        data: {
-            labels: ["On Time", "Late", "Absent"],
-            datasets: [{
-                data: [{{ $presentToday ?? 0 }}, {{ $lateToday ?? 0 }}, {{ $absentToday ?? 0 }}],
-                backgroundColor: ['#4e73df', '#f6c23e', '#e74a3b'],
-                hoverBackgroundColor: ['#2e59d9', '#d9b92e', '#d12e26'],
-                hoverBorderColor: "rgba(234, 236, 244, 1)",
-            }],
-        },
-        options: {
-            maintainAspectRatio: false,
-            tooltips: {
-                backgroundColor: "rgb(255,255,255)",
-                bodyFontColor: "#858796",
-                borderColor: '#dddfeb',
-                borderWidth: 1,
-                xPadding: 15,
-                yPadding: 15,
-                displayColors: false,
-                caretPadding: 10,
-            },
-            legend: {
-                display: false
-            },
-            cutoutPercentage: 80,
-        },
-    });
-</script>
 @endsection

@@ -103,6 +103,9 @@
                         <div>
                             <button type="submit" class="btn btn-primary">Filter</button>
                             <a href="{{ route('employee.attendance.history') }}" class="btn btn-secondary">Reset</a>
+                            <button type="button" class="btn btn-success" onclick="exportEmployeeAttendance()">
+                                <i class="fas fa-file-excel me-2"></i>Export to Excel
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -207,4 +210,25 @@
         </div>
     </div>
 </div>
+
+<script>
+    function exportEmployeeAttendance() {
+        // Collect form data
+        const startDate = document.getElementById('start_date')?.value;
+        const endDate = document.getElementById('end_date')?.value;
+        const status = document.getElementById('status')?.value;
+
+        // Build query string with current filter values
+        let queryString = '?';
+        if(startDate) queryString += 'start_date=' + encodeURIComponent(startDate) + '&';
+        if(endDate) queryString += 'end_date=' + encodeURIComponent(endDate) + '&';
+        if(status) queryString += 'status=' + encodeURIComponent(status) + '&';
+
+        // Remove trailing &
+        queryString = queryString.slice(0, -1);
+
+        // Redirect to export route with filters
+        window.location.href = '{{ route('employee.attendance.export') }}' + queryString;
+    }
+</script>
 @endsection

@@ -4,9 +4,15 @@
 <div class="container-fluid px-4">
     <div class="d-sm-flex align-items-center justify-content-between mb-4">
         <h1 class="h3 mb-0 text-gray-800">Employee Dashboard</h1>
-        <a href="{{ route('employee.attendance.scan') }}" class="d-none d-sm-inline-block btn btn-sm btn-success shadow-sm">
-            <i class="fas fa-qrcode fa-sm text-white-50"></i> QR Check-in
-        </a>
+        @if($todayAttendance && !$todayAttendance->check_out_time)
+            <a href="{{ route('employee.attendance.scan') }}" class="d-none d-sm-inline-block btn btn-sm btn-success shadow-sm">
+                <i class="fas fa-sign-out-alt fa-sm text-white-50"></i> QR Check-out
+            </a>
+        @else
+            <a href="{{ route('employee.attendance.scan') }}" class="d-none d-sm-inline-block btn btn-sm btn-success shadow-sm">
+                <i class="fas fa-qrcode fa-sm text-white-50"></i> QR Check-in
+            </a>
+        @endif
     </div>
 
     <!-- Content Row -->
@@ -110,9 +116,14 @@
                                 </h4>
                                 <p class="mb-1"><strong>Check-in:</strong> {{ $todayAttendance->check_in_time ? $todayAttendance->check_in_time->timezone('Asia/Jakarta')->format('d M Y H:i') : 'N/A' }}</p>
                                 @if($todayAttendance->check_out_time)
-                                    <p class="mb-1"><strong>Check-out:</strong> {{ $todayAttendance->check_out_time }}</p>
+                                    <p class="mb-1"><strong>Check-out:</strong> {{ $todayAttendance->check_out_time->timezone('Asia/Jakarta')->format('d M Y H:i') }}</p>
+                                @else
+                                    <p class="mb-1"><strong>Status:</strong> <span class="badge bg-warning">Not Checked Out</span></p>
+                                    <a href="{{ route('employee.attendance.scan') }}" class="btn btn-success mt-2">
+                                        <i class="fas fa-sign-out-alt me-2"></i>QR Check-out
+                                    </a>
                                 @endif
-                                <p class="text-muted mb-0"><strong>Location:</strong> {{ $todayAttendance->location ?? 'N/A' }}</p>
+                                <p class="text-muted mb-0"><strong>Location:</strong> {{ $todayAttendance->check_in_latitude ?? 'N/A' }}, {{ $todayAttendance->check_in_longitude ?? 'N/A' }}</p>
                             </div>
                         </div>
                     @else
@@ -189,11 +200,19 @@
                 </div>
                 <div class="card-body">
                     <div class="row">
-                        <div class="col-md-3 col-6 mb-3">
-                            <a href="{{ route('employee.attendance.scan') }}" class="btn btn-success w-100">
-                                <i class="fas fa-qrcode me-2"></i>QR Check-in
-                            </a>
-                        </div>
+                        @if($todayAttendance && !$todayAttendance->check_out_time)
+                            <div class="col-md-3 col-6 mb-3">
+                                <a href="{{ route('employee.attendance.scan') }}" class="btn btn-success w-100">
+                                    <i class="fas fa-sign-out-alt me-2"></i>QR Check-out
+                                </a>
+                            </div>
+                        @else
+                            <div class="col-md-3 col-6 mb-3">
+                                <a href="{{ route('employee.attendance.scan') }}" class="btn btn-success w-100">
+                                    <i class="fas fa-qrcode me-2"></i>QR Check-in
+                                </a>
+                            </div>
+                        @endif
                         <div class="col-md-3 col-6 mb-3">
                             <a href="{{ route('employee.attendance.history') }}" class="btn btn-primary w-100">
                                 <i class="fas fa-history me-2"></i>Attendance History

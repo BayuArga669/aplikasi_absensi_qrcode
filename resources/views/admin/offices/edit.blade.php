@@ -83,8 +83,24 @@
                                 @enderror
                             </div>
                             <div class="col-md-6 mb-3">
+                                <label for="check_out_deadline" class="form-label">Check-out Deadline</label>
+                                <input type="time" class="form-control @error('check_out_deadline') is-invalid @enderror" id="check_out_deadline" name="check_out_deadline" value="{{ old('check_out_deadline', $office->check_out_deadline) }}" required>
+                                <div class="form-text">After this time, employees can check out with any QR code</div>
+                                @error('check_out_deadline')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
                                 <div id="map" style="height: 300px; border: 1px solid #ddd; border-radius: 5px;"></div>
                                 <div class="form-text mt-2">Drag the marker to set the exact location</div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <div class="form-text mt-4">
+                                    <p><strong>Check-in:</strong> Before the deadline, employees must be on time or they'll be marked as late</p>
+                                    <p><strong>Check-out:</strong> Before the deadline, same QR code required; after deadline, any QR code allowed</p>
+                                </div>
                             </div>
                         </div>
                         

@@ -121,13 +121,13 @@
                                 </td>
                                 <td>{{ $request->created_at ? $request->created_at->timezone('Asia/Jakarta')->format('d M Y') : '-' }}</td>
                                 <td>
-                                    @if($request->processed_at)
-                                        {{ $request->processed_at->format('M d, Y H:i') }}
+                                    @if($request->approved_at)
+                                        {{ $request->approved_at->format('M d, Y H:i') }}
                                     @else
                                         -
                                     @endif
                                 </td>
-                                <td>{{ $request->processedBy->name ?? '-' }}</td>
+                                <td>{{ $request->approver->name ?? '-' }}</td>
                             </tr>
                         @empty
                             <tr>

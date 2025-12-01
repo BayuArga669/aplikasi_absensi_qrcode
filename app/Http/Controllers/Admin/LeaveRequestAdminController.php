@@ -43,12 +43,14 @@ class LeaveRequestAdminController extends Controller
     public function reject(Request $request, $id)
     {
         $leaveRequest = LeaveRequest::findOrFail($id);
-        
+
         $leaveRequest->update([
             'status' => 'rejected',
+            'approved_by' => auth()->id(), // Admin yang menolak
+            'approved_at' => Carbon::now(), // Waktu ditolak
             'rejection_reason' => $request->rejection_reason ?? 'Not specified'
         ]);
-        
+
         return redirect()->route('admin.leave-requests')->with('success', 'Leave request rejected successfully.');
     }
 }

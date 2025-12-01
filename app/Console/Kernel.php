@@ -12,7 +12,8 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule): void
     {
-        // $schedule->command('inspire')->hourly();
+        // Run the absent marking command daily at 11:59 PM to mark absent for the current day
+        $schedule->command('app:mark-daily-absent --date="yesterday"')->dailyAt('23:59');
     }
 
     /**
@@ -26,6 +27,7 @@ class Kernel extends ConsoleKernel
         
     }
     protected $commands = [
-    \App\Console\Commands\MakeServiceCommand::class,
+        \App\Console\Commands\MakeServiceCommand::class,
+        \App\Console\Commands\MarkDailyAbsent::class,
     ];
 }
